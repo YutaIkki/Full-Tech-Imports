@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Carrinho - Full Tech Imports</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+</head>
+<body>
+
+<header>
+  <h1>Seu Carrinho</h1>
+  <div class="header-buttons">
+    <a href="{{ url_for('index') }}" class="btn-carrinho">← Voltar para produtos</a>
+  </div>
+</header>
+
+<main>
+  <div class="carrinho-container">
+    <div class="carrinho-header">🛒 Seu Carrinho</div>
+
+    {% if carrinho %}
+      <table class="carrinho-table">
+        <thead>
+          <tr>
+            <th>Produto</th>
+            <th>Preço Unitário</th>
+            <th>Quantidade</th>
+            <th>Subtotal</th>
+            <th>Remover</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for produto_id, item in carrinho.items() %}
+          <tr>
+            <td>{{ item.nome }}</td>
+            <td>R$ {{ "%.2f"|format(item.preco) }}</td>
+            <td>{{ item.quantidade }}</td>
+            <td>R$ {{ "%.2f"|format(item.preco * item.quantidade) }}</td>
+            <td>
+              <form action="{{ url_for('remover_do_carrinho', produto_id=produto_id) }}" method="post" style="margin:0;">
+                <button type="submit" class="btn-remover">Remover</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="carrinho-total">
+        Total: R$ {{ "%.2f"|format(total) }}
+      </div>
+
+      <div style="text-align: right;">
+        <button class="btn-finalizar">Finalizar Compra</button>
+      </div>
+    {% else %}
+      <p style="text-align:center; margin-top:30px;">Seu carrinho está vazio.</p>
+    {% endif %}
+  </div>
+</main>
+
+</body>
+</html>

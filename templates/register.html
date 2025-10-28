@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastro - Full Tech</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-box">
+      <h1>Cadastro</h1>
+      <form method="POST">
+        <label>Nome:</label>
+        <input type="text" name="nome" required>
+
+        <label>Email:</label>
+        <input type="email" name="email" required>
+
+        <label>Senha:</label>
+        <input type="password" name="senha" required>
+
+        <button type="submit">Cadastrar</button>
+      </form>
+      <p>Já tem conta? <a href="{{ url_for('login') }}">Fazer login</a></p>
+    </div>
+  </div>
+</body>
+</html>

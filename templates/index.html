@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Full Tech Imports - Loja de Autopeças</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+</head>
+
+<body>
+
+  <header>
+    <h1>Full Tech Imports</h1>
+    <div class="header-buttons">
+      <a href="{{ url_for('carrinho') }}" class="btn-carrinho">Ver Carrinho</a>
+
+      {% if 'usuario_id' in session %}
+      <a href="{{ url_for('perfil') }}" class="btn-sair">{{ session['usuario_nome'] }}</a>
+
+      {% if perfil == 'Admin' %}
+      <a href="{{ url_for('dashboard') }}" class="btn-dashboard">Dashboard</a>
+      {% endif %}
+
+      <a href="{{ url_for('logout') }}" class="btn-sair">Sair</a>
+      {% else %}
+      <a href="{{ url_for('login') }}" class="btn-sair">Login</a>
+      {% endif %}
+    </div>
+
+  </header>
+
+  <main class="conteudo-principal">
+    <aside class="menu-lateral">
+      <h2>Categorias</h2>
+      <ul>
+        <li class="{% if not categoria_selecionada %}active{% endif %}">
+          <a class="{% if not categoria_selecionada %}active{% endif %}" href="{{ url_for('index') }}">Todas</a>
+        </li>
+        {% for cat in categorias %}
+        <li class="{% if categoria_selecionada == cat['id'] %}active{% endif %}">
+          <a class="{% if categoria_selecionada == cat['id'] %}active{% endif %}"
+            href="{{ url_for('categoria', categoria_id=cat['id']) }}">{{ cat['nome'] }}</a>
+        </li>
+        {% endfor %}
+      </ul>
+    </aside>
+
+    <section>
+      <h2>Catálogo de {{ categoria_nome if categoria_nome else 'Produtos' }}</h2>
+
+      <div class="produtos">
+        {% for produto in produtos %}
+        <div class="produto">
+          {% if produto['imagem'] and produto['imagem'].startswith('http') %}
+          <img src="{{ produto['imagem'] }}" alt="{{ produto['nome'] }}"
+            onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/logo.png') }}';"
+            referrerpolicy="no-referrer" />
+          {% else %}
+          <img src="{{ url_for('static', filename='img/' ~ (produto['imagem'] or 'logo.png')) }}"
+            alt="{{ produto['nome'] }}"
+            onerror="this.onerror=null;this.src='{{ url_for('static', filename='/img/logo.png') }}';" />
+          {% endif %}
+
+          <h3>{{ produto['nome'] }}</h3>
+          {% if produto['descricao'] %}
+          <p>{{ produto['descricao'] }}</p>
+          {% endif %}
+          <p><strong>Preço:</strong> R$ {{ "%.2f"|format(produto['preco']) }}</p>
+          {% if produto['preco_pix'] %}
+          <p><strong>Pix:</strong> R$ {{ "%.2f"|format(produto['preco_pix']) }}</p>
+          {% endif %}
+          <form action="{{ url_for('add_to_cart', produto_id=produto['id']) }}" method="post">
+            <button type="submit">Adicionar ao Carrinho</button>
+          </form>
+        </div>
+        {% endfor %}
+
+        {% if not produtos %}
+        <p>Sem produtos nessa categoria por enquanto.</p>
+        {% endif %}
+      </div>
+    </section>
+  </main>
+</body>
+
+</html>
