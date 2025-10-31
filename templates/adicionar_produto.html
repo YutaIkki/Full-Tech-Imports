@@ -60,14 +60,9 @@
                         <label>Categoria:</label>
                         <select name="categoria" required>
                             <option value="">Selecione...</option>
-                            <option value="Motor">Motor</option>
-                            <option value="Pneus">Pneus</option>
-                            <option value="Freios">Freios</option>
-                            <option value="Transmissão">Transmissão</option>
-                            <option value="Suspensão">Suspensão</option>
-                            <option value="Elétrica Automotiva">Elétrica Automotiva</option>
-                            <option value="Lubrificantes e Aditivos">Lubrificantes e Aditivos</option>
-                            <option value="Sistema de Combustível">Sistema de Combustível</option>
+                            {% for categoria in categorias %}
+                            <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
+                            {% endfor %}
                         </select>
                     </div>
 

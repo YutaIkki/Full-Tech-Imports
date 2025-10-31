@@ -1,29 +1,134 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cadastro - Full Tech</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
 </head>
+
 <body>
   <div class="login-container">
     <div class="login-box">
-      <h1>Cadastro</h1>
+      <div class="logo-section">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Full Tech Imports">
+        <h1>Cadastro</h1>
+      </div>
+
       <form method="POST">
-        <label>Nome:</label>
-        <input type="text" name="nome" required>
+        <div class="form-group">
+          <label>Nome</label>
+          <input type="text" name="nome" placeholder="Seu nome completo" required>
+        </div>
 
-        <label>Email:</label>
-        <input type="email" name="email" required>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" placeholder="seu@email.com" required>
+        </div>
 
-        <label>Senha:</label>
-        <input type="password" name="senha" required>
+        <div class="form-group">
+          <label>Senha</label>
+          <div class="password-container">
+            <input type="password" name="senha" id="senha" placeholder="Crie uma senha" required>
+            <button type="button" class="toggle-password" onclick="togglePassword('senha')">
+              <svg class="eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+          </div>
+        </div>
 
-        <button type="submit">Cadastrar</button>
+        <div class="form-group">
+          <label>Confirmar Senha</label>
+          <div class="password-container">
+            <input type="password" name="confirmar_senha" id="confirmar_senha" placeholder="Repita a senha" required>
+            <button type="button" class="toggle-password" onclick="togglePassword('confirmar_senha')">
+              <svg class="eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group termos-group">
+          <label class="termos-label">
+            <input type="checkbox" name="termos" id="termos">
+            <span class="checkmark"></span>
+            Li e concordo com os <a href="#" class="termos-link">termos de serviço</a>
+          </label>
+          <p id="error-termos" class="error-message-termos">Você deve aceitar os termos de serviço antes de
+            continuar.</p>
+        </div>
+
+        <button type="submit" class="login-btn">Cadastrar</button>
       </form>
-      <p>Já tem conta? <a href="{{ url_for('login') }}">Fazer login</a></p>
+
+      <p class="register-link">Já tem conta? <a href="{{ url_for('login') }}">Fazer login</a></p>
     </div>
   </div>
+
+  <script>
+    function togglePassword(fieldId) {
+      const senhaInput = document.getElementById(fieldId);
+      const eyeIcon = senhaInput.parentNode.querySelector('.eye-icon');
+
+      if (senhaInput.type === 'password') {
+        senhaInput.type = 'text';
+        eyeIcon.innerHTML = `
+        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+        <line x1="1" y1="1" x2="23" y2="23"></line>
+      `;
+      } else {
+        senhaInput.type = 'password';
+        eyeIcon.innerHTML = `
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+        <circle cx="12" cy="12" r="3"></circle>
+      `;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.querySelector('form');
+      const senha = document.getElementById('senha');
+      const confirmarSenha = document.getElementById('confirmar_senha');
+      const termos = document.getElementById('termos');
+      const errorMsg = document.getElementById('error-termos');
+
+      errorMsg.style.display = 'none';
+
+      form.addEventListener('submit', function (e) {
+        let erro = false;
+        errorMsg.style.display = 'none';
+
+        if (senha.value !== confirmarSenha.value) {
+          e.preventDefault();
+          alert('As senhas não coincidem!');
+          erro = true;
+        }
+
+        if (!termos.checked) {
+          e.preventDefault();
+          errorMsg.style.display = 'block';
+          termos.focus();
+          erro = true;
+        }
+
+        return !erro;
+      });
+
+      termos.addEventListener('change', () => {
+        if (termos.checked) {
+          errorMsg.style.display = 'none';
+        }
+      });
+    });
+  </script>
+
 </body>
 </html>

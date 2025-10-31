@@ -2,87 +2,259 @@
 <html lang="pt-br">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Full Tech Imports - Loja de Autopeças</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Full Tech Imports - Loja de Autopeças</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 
-<body>
+<body class="catalogo-page">
+    <header class="header">
+        <a href="{{ url_for('index') }}" class="logo-link">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo Full Tech Imports"
+                class="header-logo" />
 
-  <header>
-    <h1>Full Tech Imports</h1>
-    <div class="header-buttons">
-      <a href="{{ url_for('carrinho') }}" class="btn-carrinho">Ver Carrinho</a>
+            <div>
+                <h2>FULL TECH IMPORTS</h2>
+                <span class="tagline">Peças de alta performance</span>
+            </div>
+        </a>
 
-      {% if 'usuario_id' in session %}
-      <a href="{{ url_for('perfil') }}" class="btn-sair">{{ session['usuario_nome'] }}</a>
+        <nav class="main-menu-links">
+            <a href="{{ url_for('index') }}">Início</a>
+            <a href="#catalogo"> Produtos</a>
+            <a href="#sobre-nos">Sobre Nós</a>
+            <a href="{{ url_for('contato') }}">Contato</a>
+        </nav>
 
-      {% if perfil == 'Admin' %}
-      <a href="{{ url_for('dashboard') }}" class="btn-dashboard">Dashboard</a>
-      {% endif %}
+        <nav class="header-nav-desktop">
+            <a href="{{ url_for('carrinho') }}" class="nav-icon" title="Carrinho">
+                <span class="material-icons">shopping_cart</span>
+            </a>
 
-      <a href="{{ url_for('logout') }}" class="btn-sair">Sair</a>
-      {% else %}
-      <a href="{{ url_for('login') }}" class="btn-sair">Login</a>
-      {% endif %}
+            {% if 'usuario_id' in session %}
+            <a href="{{ url_for('perfil') }}" class="nav-icon" title="Meu Perfil">
+                <span class="material-icons">account_circle</span>
+            </a>
+
+            {% if perfil == 'Admin' %}
+            <a href="{{ url_for('dashboard') }}" class="nav-icon" title="Dashboard">
+                <span class="material-icons">bar_chart</span>
+            </a>
+            <a href="{{ url_for('adicionar_produto') }}" class="nav-icon" title="Adicionar Produto">
+                <span class="material-icons">inventory_2</span>
+            </a>
+            {% endif %}
+
+            <a href="{{ url_for('logout') }}" class="nav-icon" title="Sair">
+                <span class="material-icons">logout</span>
+            </a>
+
+            {% else %}
+            <a href="{{ url_for('login') }}" class="nav-login-link">Login</a>
+            {% endif %}
+        </nav>
+
+        <div class="menu-toggle">
+            <div id="menuOpen" class="menu-icon" onclick="toggleMenu(true)">&#9776;</div>
+        </div>
+
+        <nav id="sideMenu" class="side-menu">
+            <div class="close-icon" onclick="toggleMenu(false)">&#10005;</div>
+
+            <a href="{{ url_for('index') }}">Início</a>
+            <a href="#catalogo">Catálogo</a>
+            <a href="#sobre-nos">Sobre Nós</a>
+            <a href="{{ url_for('contato') }}">Contato</a>
+
+            <hr style="border-top: 1px solid rgba(255, 255, 255, 0.1); margin: 10px 32px;">
+
+            <a href="{{ url_for('carrinho') }}">Carrinho</a>
+
+            {% if 'usuario_id' in session %}
+            {% if perfil == 'Admin' %}
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            {% endif %}
+            <a href="{{ url_for('perfil') }}">{{ session['usuario_nome'] }}</a>
+            <a href="{{ url_for('logout') }}">Sair</a>
+            {% else %}
+            <a href="{{ url_for('login') }}">Login</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <div class="hero-banner">
+        <div class="hero-overlay">
+            <h1>A mais alta tecnologia em <span class="highlight">Peças Importadas</span> para o seu veículo.</h1>
+            <p>Descubra nossa vasta seleção de componentes de performance e reposição.</p>
+            <a href="#catalogo" class="btn-call-to-action">Ver Catálogo de Produtos</a>
+        </div>
     </div>
 
-  </header>
+    <section class="partner-logos">
 
-  <main class="conteudo-principal">
-    <aside class="menu-lateral">
-      <h2>Categorias</h2>
-      <ul>
-        <li class="{% if not categoria_selecionada %}active{% endif %}">
-          <a class="{% if not categoria_selecionada %}active{% endif %}" href="{{ url_for('index') }}">Todas</a>
-        </li>
-        {% for cat in categorias %}
-        <li class="{% if categoria_selecionada == cat['id'] %}active{% endif %}">
-          <a class="{% if categoria_selecionada == cat['id'] %}active{% endif %}"
-            href="{{ url_for('categoria', categoria_id=cat['id']) }}">{{ cat['nome'] }}</a>
-        </li>
-        {% endfor %}
-      </ul>
-    </aside>
+        <h1 class="section-heading">Principais fornecedores</h1>
 
-    <section>
-      <h2>Catálogo de {{ categoria_nome if categoria_nome else 'Produtos' }}</h2>
-
-      <div class="produtos">
-        {% for produto in produtos %}
-        <div class="produto">
-          {% if produto['imagem'] and produto['imagem'].startswith('http') %}
-          <img src="{{ produto['imagem'] }}" alt="{{ produto['nome'] }}"
-            onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/logo.png') }}';"
-            referrerpolicy="no-referrer" />
-          {% else %}
-          <img src="{{ url_for('static', filename='img/' ~ (produto['imagem'] or 'logo.png')) }}"
-            alt="{{ produto['nome'] }}"
-            onerror="this.onerror=null;this.src='{{ url_for('static', filename='/img/logo.png') }}';" />
-          {% endif %}
-
-          <h3>{{ produto['nome'] }}</h3>
-          {% if produto['descricao'] %}
-          <p>{{ produto['descricao'] }}</p>
-          {% endif %}
-          <p><strong>Preço:</strong> R$ {{ "%.2f"|format(produto['preco']) }}</p>
-          {% if produto['preco_pix'] %}
-          <p><strong>Pix:</strong> R$ {{ "%.2f"|format(produto['preco_pix']) }}</p>
-          {% endif %}
-          <form action="{{ url_for('add_to_cart', produto_id=produto['id']) }}" method="post">
-            <button type="submit">Adicionar ao Carrinho</button>
-          </form>
+        <div class="logo-container">
+            <img src="{{ url_for('static', filename='img/Audi logo.png') }}" alt="Logo Marca 1" class="partner-logo">
+            <img src="{{ url_for('static', filename='img/honda logo.png') }}" alt="Logo Marca 2" class="partner-logo">
+            <img src="{{ url_for('static', filename='img/jeep marca.png') }}" alt="Logo Marca 3" class="partner-logo">
+            <img src="{{ url_for('static', filename='img/mercedes logo.png') }}" alt="Logo Marca 4"
+                class="partner-logo">
+            <img src="{{ url_for('static', filename='img/toyota logo.png') }}" alt="Logo Marca 5" class="partner-logo">
+            <img src="{{ url_for('static', filename='img/volkswagen logo.png') }}" alt="Logo Marca 6"
+                class="partner-logo">
         </div>
-        {% endfor %}
-
-        {% if not produtos %}
-        <p>Sem produtos nessa categoria por enquanto.</p>
-        {% endif %}
-      </div>
     </section>
-  </main>
+    <section class="about-us-section" id="sobre-nos">
+        <div class="about-us-content">
+            <h2 class="about-us-title">Nossa História e Missão</h2>
+            <div class="about-us-grid">
+                <div class="about-us-text">
+                    <p>
+                        A <strong> Full tech Imports</strong> nasceu da paixão por carros e da necessidade de peças de
+                        alta qualidade e performance no mercado brasileiro. Desde 2025, dedicamo-nos a importar e
+                        fornecer componentes automotivos premium, com foco em tecnologia e durabilidade.
+                    </p>
+                    <p>
+                        Nossa missão é simples: garantir que seu veículo atinja seu potencial máximo de performance e
+                        segurança, oferecendo um catálogo exclusivo de peças que atendem aos padrões mais rigorosos
+                        internacionais. Trabalhamos apenas com fornecedores renomados, garantindo a procedência de cada
+                        item que vendemos.
+                    </p>
+                    <p class="highlight-text">
+                        **Qualidade, tecnologia e o melhor desempenho para a sua máquina. Essa é a Full Tech Imports.**
+                    </p>
+                </div>
+                <div class="about-us-image-container">
+                    <img src="{{ url_for('static', filename='img/missao.png') }}"
+                        alt="Imagem de equipe ou peças de alta performance" class="about-us-image">
+                </div>
+            </div>
+        </div>
+    </section>
+    <main class="conteudo-principal" id="catalogo">
+        <aside class="menu-lateral">
+            <h2>Categorias</h2>
+            <ul>
+                <li class="{% if not categoria_selecionada %}active{% endif %}">
+                    <a class="{% if not categoria_selecionada %}active{% endif %}"
+                        href="{{ url_for('index') }}#catalogo">Todas</a>
+                </li>
+                {% for cat in categorias %}
+                <li class="{% if categoria_selecionada == cat['id'] %}active{% endif %}">
+                    <a class="{% if categoria_selecionada == cat['id'] %}active{% endif %}"
+                        href="{{ url_for('categoria', categoria_id=cat['id']) }}#catalogo">{{ cat['nome'] }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </aside>
+
+        <section style="flex-grow: 1;">
+            <h2 class="section-title">Catálogo de {{ categoria_nome if categoria_nome else 'Produtos' }}</h2>
+
+            {% set default_logo_url = url_for('static', filename='img/logo.png') %}
+
+            <div class="produtos">
+                {% for produto in produtos %}
+                <div class="produto">
+                    {% if produto['imagem'] %}
+                    {% if produto['imagem'].startswith('http') %}
+                    <img src="{{ produto['imagem'] }}" alt="{{ produto['nome'] }}"
+                        onerror="this.onerror=null;this.src='{{ default_logo_url }}';" referrerpolicy="no-referrer" />
+                    {% else %}
+                    <img src="{{ url_for('static', filename=produto['imagem']) }}" alt="{{ produto['nome'] }}"
+                        onerror="this.onerror=null;this.src='{{ default_logo_url }}';" />
+                    {% endif %}
+                    {% else %}
+                    <img src="{{ default_logo_url }}" alt="{{ produto['nome'] }}" />
+                    {% endif %}
+
+                    <h3>{{ produto['nome'] }}</h3>
+
+                    <div class="estrelas">
+                        <span class="star-filled">★</span><span class="star-filled">★</span><span
+                            class="star-filled">★</span><span class="star-filled">★</span><span
+                            class="star-empty">★</span>
+                    </div>
+
+                    <div class="preco-info">
+                        {% if produto['descricao'] %}
+                        <p style="font-size: 14px; margin-bottom: 5px;">{{ produto['descricao'][:50] }}...</p>
+                        {% endif %}
+                        <p class="preco-regular">R$ {{ "%.2f"|format(produto['preco']) }}</p>
+                        {% if produto['preco_pix'] %}
+                        <div class="pix-box">
+                            <p>À vista no PIX: <strong>R$ {{ "%.2f"|format(produto['preco_pix']) }}</strong></p>
+                            <p class="pix-economia">Economize R$ {{ "%.2f"|format(produto['preco'] -
+                                produto['preco_pix']) }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <form action="{{ url_for('add_to_cart', produto_id=produto['id']) }}" method="post">
+                        <button type="submit" class="btn-add-carrinho">Adicionar ao Carrinho</button>
+                    </form>
+                </div>
+                {% endfor %}
+
+                {% if not produtos %}
+                <p>Sem produtos nessa categoria por enquanto.</p>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="footer-logo">
+                    <span>⚙️</span>
+                    <h3>Full Tech Imports</h3>
+                </div>
+                <p>A mais alta tecnologia em peças importadas para o seu veículo. Qualidade e performance garantidas.
+                </p>
+                <p>&copy; 2025 Full Tech Imports</p>
+            </div>
+            <div class="footer-section">
+                <h4>Navegação</h4>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Início</a></li>
+                    <li><a href="#catalogo">Catálogo</a></li>
+                    <li><a href="#sobre-nos">Sobre Nós</a></li>
+                    <li><a href="{{ url_for('contato') }}">Contato</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Atendimento</h4>
+                <ul>
+                    <li><a href="{{ url_for('perfil') }}">Minha Conta</a></li>
+                    <li><a href="{{ url_for('carrinho') }}">Rastrear Pedido</a></li>
+                    <li><a href="#">Política de Troca</a></li>
+                    <li><a href="#">Fale Conosco</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            Todos os direitos reservados.
+        </div>
+    </footer>
+
+    <script>
+        function toggleMenu(open) {
+            const menu = document.getElementById("sideMenu");
+            if (open) {
+                menu.classList.add("open");
+                document.body.style.overflow = 'hidden';
+            } else {
+                menu.classList.remove("open");
+                document.body.style.overflow = 'auto';
+            }
+        }
+    </script>
+
 </body>
 
 </html>

@@ -6,135 +6,149 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Administrador</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
     <style>
         body {
             font-family: 'Poppins', sans-serif;
             margin: 0;
-            background: linear-gradient(135deg, #ffffff, #ffffff);
+            background: #ffffff;
             color: #111;
-            min-height: 100vh;
         }
 
         header.dashboard-header {
-            background: rgba(13, 11, 105, 0.95);
-            color: rgb(255, 255, 255);
+            background: #0d0b69;
+            color: white;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 30px;
-            font-size: 18px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            padding: 25px 40px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.6rem;
+            font-weight: 600;
         }
 
         header a {
-            color: rgb(0, 0, 0);
+            color: #fff;
             text-decoration: none;
             margin-left: 20px;
             transition: 0.3s;
         }
 
         header a:hover {
-            text-decoration: underline;
-            color: #00bfff;
+            color: #020079;
         }
 
         .dashboard-container {
-            padding: 40px;
+            padding: 40px 70px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            gap: 50px;
         }
 
         .dashboard-cards {
             display: flex;
-            justify-content: center;
             flex-wrap: wrap;
+            justify-content: center;
             gap: 25px;
-            margin-bottom: 30px;
+            width: 100%;
         }
 
         .dashboard-card {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px 40px;
+            background: #ffffff;
+            border: 1px solid #e8e8f3;
+            border-radius: 12px;
+            padding: 25px 50px;
             text-align: center;
-            color: rgb(0, 0, 0);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s, background 0.3s;
+            box-shadow: 0 4px 15px rgba(13, 11, 105, 0.05);
             min-width: 220px;
+            transition: 0.3s;
         }
 
         .dashboard-card:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 6px 20px rgba(13, 11, 105, 0.1);
         }
 
         .dashboard-card h3 {
+            color: #0d0b69;
             margin-bottom: 10px;
-            font-size: 16px;
+            font-size: 15px;
         }
 
         .dashboard-card p {
-            font-size: 22px;
-            font-weight: bold;
-            color: #000000;
+            font-size: 26px;
+            font-weight: 700;
+            color: #000;
         }
 
         .dashboard-charts {
             display: flex;
-            justify-content: center;
             flex-wrap: wrap;
-            gap: 20px;
-            margin-bottom: 30px;
+            justify-content: center;
+            gap: 35px;
+            width: 100%;
         }
 
         .chart-box {
-            background: rgba(255, 255, 255, 0.25);
-            border-radius: 20px;
+            background: #ffffff;
+            border: 1px solid #ececf5;
+            border-radius: 16px;
             padding: 20px;
-            width: 40%;
-            max-width: 600px;
-            min-width: 380px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(8px);
+            width: 32%;
+            min-width: 300px;
+            max-width: 480px;
+            height: 270px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .chart-box h3 {
+            color: #0d0b69;
+            text-align: center;
+            font-size: 15px;
+            margin-bottom: 10px;
         }
 
         canvas {
             width: 100% !important;
-            height: 280px !important;
+            height: 210px !important;
         }
 
         table.dashboard-table {
-            width: 90%;
+            width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
+            border-radius: 12px;
             overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
         }
 
         table th {
-            padding: 12px;
-            text-align: center;
+            padding: 14px;
             background-color: #0d0b69;
             color: white;
-            font-weight: bold;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
         }
 
         table td {
             padding: 12px;
             text-align: center;
-            color: rgb(0, 0, 0);
-            background-color: rgba(226, 226, 226, 0.541);
-            border-bottom: 1px solid rgba(68, 68, 68, 0.1);
+            background: #f9f9ff;
+            color: #000;
+        }
+
+        table tbody tr:nth-child(even) {
+            background: #f3f4ff;
         }
 
         table tbody tr:hover {
-            background-color: rgba(255, 255, 255, 0.15);
-            transition: background-color 0.3s ease;
+            background: #e7e8ff;
         }
 
         .btn-editar,
@@ -142,11 +156,12 @@
         .btn-adicionar {
             display: inline-block;
             padding: 6px 14px;
-            border-radius: 8px;
-            color: rgb(255, 250, 250);
+            border-radius: 6px;
+            color: #fff;
             text-decoration: none;
             font-weight: 500;
-            transition: 0.3s;
+            transition: 0.2s;
+            font-size: 13px;
         }
 
         .btn-editar {
@@ -154,40 +169,148 @@
         }
 
         .btn-editar:hover {
-            background: #0062cc;
+            background: #005fcc;
         }
 
         .btn-remover {
-            background: #ff4040;
+            background: #e74c3c;
         }
 
         .btn-remover:hover {
-            background: #cc0000;
+            background: #c0392b;
         }
 
         .btn-adicionar {
             background: linear-gradient(45deg, #0d0b69, #00bfff);
             margin-top: 25px;
-            padding: 10px 25px;
-            border-radius: 10px;
+            padding: 10px 26px;
+            border-radius: 8px;
         }
 
         .btn-adicionar:hover {
             transform: scale(1.05);
-            background: linear-gradient(45deg, #00bfff, #0d0b69);
         }
 
-        .btn-inicio{
-            color: white;
+        .section-block {
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid #ececf5;
+            border-radius: 12px;
+            padding: 35px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
-        
-        .btn-sair{
-            color: white;
+
+        .section-title {
+            color: #0d0b69;
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 20px;
         }
 
         footer {
-            color: white;
+            color: #0d0b69;
             margin-top: 40px;
+        }
+
+        .dashboard-header {
+            background: #0b0a61;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 35px;
+            position: relative;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .menu-toggle {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .menu-icon {
+            font-size: 28px;
+            cursor: pointer;
+            user-select: none;
+            color: white;
+            z-index: 1100;
+        }
+
+        .menu-icon:hover {
+            transform: scale(1.15);
+        }
+
+        .menu-icon.close {
+            display: none;
+            font-size: 30px;
+        }
+
+        .side-menu {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100%;
+            width: 0;
+            background: #0b0a61;
+            color: #fff;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding-top: 80px;
+            transition: width 0.3s ease;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
+            z-index: 1100;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .close-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            color: white;
+            transition: transform 0.2s;
+        }
+
+        .close-icon:hover {
+            transform: scale(1.2);
+        }
+
+        .side-menu a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 15px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .side-menu a:hover {
+            background: #1200b3;
+            color: white;
+        }
+
+        .side-menu.open {
+            width: 250px;
+            padding-left: 25px;
+            padding-right: 25px;
+        }
+
+        body.menu-open::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 998;
         }
     </style>
 </head>
@@ -195,10 +318,18 @@
 <body>
     <header class="dashboard-header">
         <h1>Painel do Administrador</h1>
-        <div>
-            <a href="{{ url_for('index') }}" class="btn-inicio">Início</a>
-            <a href="{{ url_for('logout') }}" class="btn-sair">Sair</a>
+
+        <div class="menu-toggle">
+            <div id="menuOpen" class="menu-icon" onclick="toggleMenu(true)">&#9776;</div>
         </div>
+
+        <nav id="sideMenu" class="side-menu">
+            <div class="close-icon" onclick="toggleMenu(false)">&#10005;</div>
+            <a href="{{ url_for('index') }}">Início</a>
+            <a href="{{ url_for('adicionar_produto') }}">Adicionar Produto</a>
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('logout') }}">Sair</a>
+        </nav>
     </header>
 
     <div class="dashboard-container">
@@ -212,73 +343,157 @@
                 <p>{{ produtos_baixo_estoque }}</p>
             </div>
             <div class="dashboard-card">
-                <h3>Renda Estimada</h3>
-                <p>R$ {{ "%.2f"|format(renda_mensal) }}</p>
+                <h3>Valor Total do Estoque</h3>
+                <p>R$ {{ "{:,.2f}".format(renda_mensal).replace(",", "X").replace(".", ",").replace("X", ".") }}</p>
+            </div>
+            <div class="dashboard-card">
+                <h3>Produtos em Falta</h3>
+                <p>{{ produtos_em_falta }}</p>
             </div>
         </div>
 
         <div class="dashboard-charts">
             <div class="chart-box">
-                <h3>Quantidade de Produtos por Categoria</h3>
+                <h3>Estoque por Categoria</h3>
                 <canvas id="chartCategorias"></canvas>
             </div>
             <div class="chart-box">
-                <h3>Valor Total por Categoria</h3>
+                <h3>Distribuição de Valor</h3>
                 <canvas id="chartValores"></canvas>
+            </div>
+            <div class="chart-box">
+                <h3>Top 5 Produtos Mais Caros</h3>
+                <canvas id="chartTopProdutos"></canvas>
             </div>
         </div>
 
-        <table class="dashboard-table">
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>Categoria</th>
-                    <th>Estoque</th>
-                    <th>Preço</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for produto in produtos %}
-                <tr>
-                    <td>{{ produto.nome }}</td>
-                    <td>{{ produto.categoria }}</td>
-                    <td>{{ produto.estoque }}</td>
-                    <td>R$ {{ "%.2f"|format(produto.preco) }}</td>
-                    <td>
-                        <a href="{{ url_for('editar_produto', produto_id=produto.id) }}" class="btn-editar">Editar</a>
-                        <a href="{{ url_for('remover_produto', produto_id=produto.id) }}"
-                            class="btn-remover">Remover</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="section-block">
+            <h3 class="section-title">Movimentações Recentes</h3>
+            <table class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Produto</th>
+                        <th>Tipo</th>
+                        <th>Quantidade</th>
+                        <th>Usuário</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mov in movimentacoes %}
+                    <tr>
+                        <td>{{ mov.data }}</td>
+                        <td>{{ mov.produto }}</td>
+                        <td>{{ mov.tipo }}</td>
+                        <td>{{ mov.quantidade }}</td>
+                        <td>{{ mov.usuario }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5">Nenhuma movimentação recente.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-        <a href="{{ url_for('adicionar_produto') }}" class="btn-adicionar">Adicionar Produto</a>
+        <div class="section-block">
+            <h3 class="section-title">Produtos Cadastrados</h3>
+            <table class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Categoria</th>
+                        <th>Estoque</th>
+                        <th>Preço</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for produto in produtos %}
+                    <tr>
+                        <td>{{ produto.nome }}</td>
+                        <td>{{ produto.categoria }}</td>
+                        <td>{{ produto.estoque }}</td>
+                        <td>
+                            R$ {{ "{:,.2f}".format(produto.preco).replace(",", "X").replace(".", ",").replace("X", ".")
+                            }}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('editar_produto', produto_id=produto.id) }}"
+                                class="btn-editar">Editar</a>
+                            <a href="{{ url_for('remover_produto', produto_id=produto.id) }}"
+                                class="btn-remover">Remover</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <a href="{{ url_for('adicionar_produto') }}" class="btn-adicionar">Adicionar Produto</a>
+        </div>
+
+        <div class="section-block">
+            <h3 class="section-title">Fornecedores</h3>
+            <table class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>CNPJ</th>
+                        <th>Contato</th>
+                        <th>Produtos</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fornecedor in fornecedores %}
+                    <tr>
+                        <td>{{ fornecedor.nome }}</td>
+                        <td>{{ fornecedor.cnpj }}</td>
+                        <td>{{ fornecedor.contato }}</td>
+                        <td>{{ fornecedor.produtos }}</td>
+                        <td>
+                            <a href="{{ url_for('editar_fornecedor', fornecedor_id=fornecedor.id) }}"
+                                class="btn-editar">Editar</a>
+                            <a href="{{ url_for('remover_fornecedor', fornecedor_id=fornecedor.id) }}"
+                                class="btn-remover">Remover</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5">Nenhum fornecedor cadastrado.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <a href="{{ url_for('adicionar_fornecedor') }}" class="btn-adicionar">Adicionar Fornecedor</a>
+        </div>
 
         <footer>
             <p>&copy; 2025 Full Tech Imports</p>
         </footer>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script>
         const categorias = {{ produtos| map(attribute = 'categoria') | list | tojson }};
         const precos = {{ produtos| map(attribute = 'preco') | list | tojson }};
         const estoques = {{ produtos| map(attribute = 'estoque') | list | tojson }};
+        const nomes = {{ produtos| map(attribute = 'nome') | list | tojson }};
 
         new Chart(document.getElementById('chartCategorias'), {
-            type: 'bar',
+            type: 'line',
             data: {
                 labels: categorias,
                 datasets: [{
-                    label: 'Estoque',
+                    label: 'Estoque por Categoria',
                     data: estoques,
-                    backgroundColor: 'rgba(13, 11, 105, 0.6)',
-                    borderRadius: 8
+                    borderColor: '#0d0b69',
+                    backgroundColor: 'rgba(13,11,105,0.2)',
+                    tension: 0.4,
+                    fill: true
                 }]
             },
-            options: { scales: { y: { beginAtZero: true } } }
+            options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
         });
 
         new Chart(document.getElementById('chartValores'), {
@@ -286,12 +501,83 @@
             data: {
                 labels: categorias,
                 datasets: [{
-                    label: 'Valor Total',
+                    label: 'Distribuição de Valor (R$)',
                     data: precos,
-                    backgroundColor: ['#007bff', '#00c3ff', '#5a6fff', '#0d0b69', '#46b3e6']
+                    backgroundColor: [
+                        '#007bff', '#00c3ff', '#5a6fff', '#0d0b69', '#46b3e6',
+                        '#85e0ff', '#003366', '#0099cc'
+                    ],
+                    borderWidth: 2,
+                    hoverOffset: 8
                 }]
+            },
+            options: {
+                cutout: '70%',
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#000', font: { size: 13 } }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                const valor = context.raw;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percent = ((valor / total) * 100).toFixed(1);
+                                return `${context.label}: R$ ${valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} (${percent}%)`;
+                            }
+                        }
+                    },
+                    beforeDraw: (chart) => {
+                        const { width, height, ctx } = chart;
+                        ctx.restore();
+                        const total = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                        ctx.font = "600 20px 'Poppins'";
+                        ctx.fillStyle = "#000";
+                        ctx.textBaseline = "middle";
+                        const text = total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                        const textX = Math.round((width - ctx.measureText(text).width) / 2);
+                        const textY = height / 2;
+                        ctx.fillText(text, textX, textY);
+                        ctx.save();
+                    }
+                }
             }
         });
+
+        new Chart(document.getElementById('chartTopProdutos'), {
+            type: 'bar',
+            data: {
+                labels: nomes.slice(0, 5),
+                datasets: [{
+                    label: 'Valor (R$)',
+                    data: precos.slice(0, 5),
+                    backgroundColor: '#00bfff'
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: { legend: { display: false } },
+                scales: { x: { beginAtZero: true } }
+            }
+        });
+        function toggleMenu(open) {
+            const menu = document.getElementById("sideMenu");
+            const openIcon = document.getElementById("menuOpen");
+            const closeIcon = document.getElementById("menuClose");
+
+            if (open) {
+                menu.classList.add("open");
+                document.body.classList.add("menu-open");
+                openIcon.style.display = "none";
+            } else {
+                menu.classList.remove("open");
+                document.body.classList.remove("menu-open");
+                openIcon.style.display = "block";
+            }
+        }
     </script>
 </body>
 

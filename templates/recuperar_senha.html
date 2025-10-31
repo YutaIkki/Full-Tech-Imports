@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Senha - Full Tech Imports</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <div class="logo-section">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Full Tech Imports">
+                <h1>Recuperar Senha</h1>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" placeholder="Seu email cadastrado" required>
+                </div>
+
+                <button type="submit" class="login-btn">Recuperar Senha</button>
+            </form>
+
+            <p class="register-link">
+                <a href="{{ url_for('login') }}">← Voltar para o login</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Adicionar Fornecedor</title>
+    <style>
+        body { font-family: Poppins, sans-serif; background: #fff; color: #111; padding: 40px; }
+        form { max-width: 400px; margin: auto; display: flex; flex-direction: column; gap: 10px; }
+        input { padding: 8px; border: 1px solid #ccc; border-radius: 6px; }
+        button { background: linear-gradient(45deg, #0d0b69, #00bfff); color: #fff; border: none; padding: 10px; border-radius: 8px; cursor: pointer; }
+        button:hover { transform: scale(1.05); }
+    </style>
+</head>
+<body>
+    <h2>Adicionar Fornecedor</h2>
+    <form method="POST">
+        <input type="text" name="nome" placeholder="Nome do Fornecedor" required>
+        <input type="text" name="cnpj" placeholder="CNPJ" required>
+        <input type="email" name="contato" placeholder="E-mail de Contato">
+        <input type="text" name="produtos" placeholder="Produtos fornecidos">
+        <button type="submit">Salvar</button>
+    </form>
+</body>
+</html>

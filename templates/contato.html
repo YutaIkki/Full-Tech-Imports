@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contato | Full Tech Imports</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        .contact-section {
+            padding: 40px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .contact-container {
+            max-width: 550px; 
+            width: 100%;
+            background-color: white;
+            padding: 25px; 
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-back-to-site {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px; 
+            margin-bottom: 25px; 
+            padding: 10px 18px;
+            
+            background-color: transparent; 
+            color: #3498db; 
+            border: 2px solid #3498db; 
+            
+            text-decoration: none;
+            border-radius: 8px; 
+            font-size: 15px;
+            font-weight: 700; 
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-back-to-site:hover {
+            background-color: #3498db; 
+            color: white; 
+            border-color: #2980b9; 
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3); 
+        }
+
+        .contact-container h2 {
+            color: #172b53;
+            font-size: 28px; 
+            margin-bottom: 8px;
+            font-weight: 700;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 8px;
+        }
+
+        .contact-container p {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .contact-form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .contact-form input[type="text"],
+        .contact-form input[type="email"],
+        .contact-form input[type="file"],
+        .contact-form textarea {
+            width: 100%;
+            padding: 10px; 
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box; 
+            font-size: 15px; 
+            transition: border-color 0.3s;
+        }
+
+        .contact-form input:focus,
+        .contact-form textarea:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+            outline: none;
+        }
+
+        .contact-form textarea {
+            resize: vertical;
+        }
+
+        .file-upload {
+            padding: 10px;
+            border: 1px dashed #3498db;
+            border-radius: 6px;
+            background-color: #eaf6ff;
+        }
+
+        .file-input {
+            width: 100%;
+            padding: 5px 0;
+            margin-top: 5px;
+        }
+
+        .file-help {
+            display: block;
+            font-size: 11px;
+            color: #777;
+            margin-top: 5px;
+        }
+
+        .form-actions {
+            margin-top: 20px;
+            text-align: center; 
+        }
+
+        .btn-submit {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            width: auto;
+            display: inline-block; 
+        }
+
+        .btn-submit:hover {
+            background-color: #2980b9;
+            transform: translateY(-1px);
+        }
+        
+    </style>
+</head>
+<body>
+
+    <section class="contact-section">
+        <div class="contact-container">
+            
+            <a href="{{ url_for('index') }}" class="btn-back-to-site">
+                &#8592; Voltar ao Site
+            </a>
+
+            <h2>Entre em Contato Conosco</h2>
+            <p>Preencha o formulário abaixo. Você pode anexar imagens ou documentos (PDF, DOC) relacionados ao seu pedido ou dúvida.</p>
+            
+            <form action="{{ url_for('contato') }}" method="POST" enctype="multipart/form-data" class="contact-form">
+                
+                <div class="form-group">
+                    <label for="nome">Nome Completo:</label>
+                    <input type="text" id="nome" name="nome" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">E-mail:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="assunto">Assunto:</label>
+                    <input type="text" id="assunto" name="assunto" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="mensagem">Mensagem:</label>
+                    <textarea id="mensagem" name="mensagem" rows="5" required></textarea>
+                </div>
+                
+                <div class="form-group file-upload">
+                    <label for="anexo">Anexar Arquivo/Imagem (opcional):</label>
+                    <input type="file" id="anexo" name="anexo" accept="image/*, .pdf, .doc, .docx" class="file-input">
+                    <small class="file-help">Anexe imagens (JPG, PNG) ou documentos (PDF, DOC). Máximo 5MB.</small>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit">Enviar Mensagem</button>
+                </div>
+                
+            </form>
+        </div>
+    </section>
+
+</body>
+</html>
