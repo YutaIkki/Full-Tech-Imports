@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+    <title>Pagamento PIX</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #4a6fa5;
+            --dark-blue: #385d8a;
+            --light-blue: #6b93c5;
+            --accent-blue: #5a7cad;
+            --text-color: #333;
+            --light-gray: #f8f9fa;
+            --white: #ffffff;
+            --success: #5cb85c;
+            --error: #d9534f;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e6f0ff, #d1e0ff);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 850px;
+            width: 100%;
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(to right, var(--primary-blue), var(--light-blue));
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(to right, var(--success), #20c997);
+        }
+        
+        .header h1 {
+            font-size: 26px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .header h1 i {
+            font-size: 30px;
+        }
+        
+        .content {
+            display: flex;
+            padding: 0;
+        }
+        
+        .qr-section {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid #eaeaea;
+        }
+        
+        .qr-container {
+            background: var(--light-gray);
+            border-radius: 15px;
+            padding: 20px;
+            display: inline-block;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e0e7ff;
+            margin-bottom: 20px;
+        }
+        
+        .qr-code {
+            width: 220px;
+            height: 220px;
+            background: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .qr-code img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 5px;
+        }
+        
+        .timer-container {
+            background: #fff8e1;
+            border-radius: 10px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border: 1px solid #ffecb3;
+            margin-top: 10px;
+        }
+        
+        .timer-container i {
+            color: #ff9800;
+            font-size: 20px;
+        }
+        
+        .timer {
+            font-size: 18px;
+            font-weight: bold;
+            color: #e65100;
+        }
+        
+        .info-section {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .instructions {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: left;
+            border-left: 4px solid var(--primary-blue);
+            flex-grow: 1;
+        }
+        
+        .instructions h3 {
+            color: var(--primary-blue);
+            margin-bottom: 15px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .instructions ol {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+            color: var(--text-color);
+        }
+        
+        .btn {
+            background: linear-gradient(to right, var(--success), #20c997);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(92, 184, 92, 0.3);
+        }
+        
+        .btn:hover {
+            background: linear-gradient(to right, #4cae4c, #1ba87e);
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(92, 184, 92, 0.4);
+        }
+        
+        .security-note {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .security-note i {
+            color: var(--success);
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            .qr-section {
+                border-right: none;
+                border-bottom: 1px solid #eaeaea;
+            }
+            
+            .qr-code {
+                width: 200px;
+                height: 200px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 22px;
+            }
+            
+            .qr-section, .info-section {
+                padding: 20px;
+            }
+            
+            .qr-code {
+                width: 180px;
+                height: 180px;
+            }
+            
+            .instructions {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fab fa-pix"></i> Pagamento via PIX</h1>
+        </div>
+        
+        <div class="content">
+            <div class="qr-section">
+                <div class="qr-container">
+                    <div class="qr-code">
+                        <img src="{{ qr_code_url }}" alt="QR Code PIX">
+                    </div>
+                </div>
+                
+                <div class="timer-container">
+                    <i class="fas fa-clock"></i>
+                    <p class="timer" id="timer">Expira em 05:00</p>
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <div class="instructions">
+                    <h3><i class="fas fa-info-circle"></i> Como pagar com PIX</h3>
+                    <ol>
+                        <li>Abra o aplicativo do seu banco</li>
+                        <li>Selecione a opção PIX</li>
+                        <li>Escaneie o QR Code ao lado</li>
+                        <li>Confirme o pagamento</li>
+                        <li>Clique em "Confirmar Pagamento" abaixo</li>
+                    </ol>
+                </div>
+                
+                <button class="btn" onclick="confirmar()">
+                    <i class="fas fa-check-circle"></i> Confirmar Pagamento
+                </button>
+                
+                <div class="security-note">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Pagamento 100% seguro via PIX</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let tempo = 300;
+        const timer = document.getElementById("timer");
+
+        const countdown = setInterval(() => {
+            if (tempo <= 0) {
+                clearInterval(countdown);
+                timer.textContent = "QR Code expirado";
+                timer.style.color = "#d9534f";
+                return;
+            }
+            
+            tempo--;
+            
+            let m = String(Math.floor(tempo / 60)).padStart(2, "0");
+            let s = String(tempo % 60).padStart(2, "0");
+            
+            timer.textContent = `Expira em ${m}:${s}`;
+            
+            if (tempo < 60) {
+                timer.style.color = "#d9534f";
+            }
+        }, 1000);
+
+        function confirmar() {
+            window.location.href = "/pedido/concluir/PIX";
+        }
+    </script>
+</body>
+</html>

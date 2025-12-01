@@ -8,14 +8,118 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        /* Estilos corrigidos para as imagens dos produtos */
+        .produto-imagem-container {
+            width: 100%;
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .produto-imagem-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            padding: 10px;
+        }
+        
+        .sem-imagem {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-size: 14px;
+            height: 100%;
+            width: 100%;
+        }
+        
+        .sem-imagem .material-icons {
+            font-size: 48px;
+            color: #adb5bd;
+            margin-bottom: 8px;
+        }
+        
+        .produtos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            padding: 20px 0;
+        }
+        
+        .produto {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            border: 1px solid #e1e5e9;
+        }
+        
+        .produto:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Estilos para o filtro de ordenação */
+        .filtro-ordenacao {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 15px 0;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .filtro-ordenacao select {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: white;
+            font-size: 14px;
+            cursor: pointer;
+            min-width: 200px;
+        }
+
+        .filtro-ordenacao select:focus {
+            outline: none;
+            border-color: #0d0b69;
+            box-shadow: 0 0 0 2px rgba(13, 11, 105, 0.1);
+        }
+
+        .contador-produtos {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .filtro-ordenacao {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .filtro-ordenacao select {
+                min-width: 100%;
+            }
+        }
+    </style>
 </head>
 
 <body class="catalogo-page">
     <header class="header">
         <a href="{{ url_for('index') }}" class="logo-link">
-            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo Full Tech Imports"
-                class="header-logo" />
-
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo Full Tech Imports" class="header-logo" />
             <div>
                 <h2>FULL TECH IMPORTS</h2>
                 <span class="tagline">Peças de alta performance</span>
@@ -24,7 +128,7 @@
 
         <nav class="main-menu-links">
             <a href="{{ url_for('index') }}">Início</a>
-            <a href="#catalogo"> Produtos</a>
+            <a href="#catalogo">Produtos</a>
             <a href="#sobre-nos">Sobre Nós</a>
             <a href="{{ url_for('contato') }}">Contato</a>
         </nav>
@@ -32,6 +136,9 @@
         <nav class="header-nav-desktop">
             <a href="{{ url_for('carrinho') }}" class="nav-icon" title="Carrinho">
                 <span class="material-icons">shopping_cart</span>
+                {% if 'carrinho' in session and session['carrinho'] %}
+                <span class="cart-count">{{ session['carrinho']|length }}</span>
+                {% endif %}
             </a>
 
             {% if 'usuario_id' in session %}
@@ -39,7 +146,7 @@
                 <span class="material-icons">account_circle</span>
             </a>
 
-            {% if perfil == 'Admin' %}
+            {% if session.get('perfil') == 'Admin' %}
             <a href="{{ url_for('dashboard') }}" class="nav-icon" title="Dashboard">
                 <span class="material-icons">bar_chart</span>
             </a>
@@ -53,7 +160,9 @@
             </a>
 
             {% else %}
-            <a href="{{ url_for('login') }}" class="nav-login-link">Login</a>
+            <a href="{{ url_for('login') }}" class="nav-icon" title="Login">
+                <span class="material-icons">account_circle</span>
+            </a>
             {% endif %}
         </nav>
 
@@ -63,18 +172,14 @@
 
         <nav id="sideMenu" class="side-menu">
             <div class="close-icon" onclick="toggleMenu(false)">&#10005;</div>
-
             <a href="{{ url_for('index') }}">Início</a>
             <a href="#catalogo">Catálogo</a>
             <a href="#sobre-nos">Sobre Nós</a>
             <a href="{{ url_for('contato') }}">Contato</a>
-
             <hr style="border-top: 1px solid rgba(255, 255, 255, 0.1); margin: 10px 32px;">
-
             <a href="{{ url_for('carrinho') }}">Carrinho</a>
-
             {% if 'usuario_id' in session %}
-            {% if perfil == 'Admin' %}
+            {% if session.get('perfil') == 'Admin' %}
             <a href="{{ url_for('dashboard') }}">Dashboard</a>
             {% endif %}
             <a href="{{ url_for('perfil') }}">{{ session['usuario_nome'] }}</a>
@@ -94,114 +199,133 @@
     </div>
 
     <section class="partner-logos">
-
-        <h1 class="section-heading">Principais fornecedores</h1>
-
+        <h1 class="section-heading">Principais Parceiros</h1>
         <div class="logo-container">
-            <img src="{{ url_for('static', filename='img/Audi logo.png') }}" alt="Logo Marca 1" class="partner-logo">
-            <img src="{{ url_for('static', filename='img/honda logo.png') }}" alt="Logo Marca 2" class="partner-logo">
-            <img src="{{ url_for('static', filename='img/jeep marca.png') }}" alt="Logo Marca 3" class="partner-logo">
-            <img src="{{ url_for('static', filename='img/mercedes logo.png') }}" alt="Logo Marca 4"
-                class="partner-logo">
-            <img src="{{ url_for('static', filename='img/toyota logo.png') }}" alt="Logo Marca 5" class="partner-logo">
-            <img src="{{ url_for('static', filename='img/volkswagen logo.png') }}" alt="Logo Marca 6"
-                class="partner-logo">
+            <img src="{{ url_for('static', filename='img/Audi logo.png') }}" alt="Logo Audi" class="partner-logo">
+            <img src="{{ url_for('static', filename='img/honda logo.png') }}" alt="Logo Honda" class="partner-logo">
+            <img src="{{ url_for('static', filename='img/jeep marca.png') }}" alt="Logo Jeep" class="partner-logo">
+            <img src="{{ url_for('static', filename='img/mercedes logo.png') }}" alt="Logo Mercedes" class="partner-logo">
+            <img src="{{ url_for('static', filename='img/toyota logo.png') }}" alt="Logo Toyota" class="partner-logo">
+            <img src="{{ url_for('static', filename='img/volkswagen logo.png') }}" alt="Logo VW" class="partner-logo">
         </div>
     </section>
+
     <section class="about-us-section" id="sobre-nos">
         <div class="about-us-content">
             <h2 class="about-us-title">Nossa História e Missão</h2>
             <div class="about-us-grid">
                 <div class="about-us-text">
                     <p>
-                        A <strong> Full tech Imports</strong> nasceu da paixão por carros e da necessidade de peças de
-                        alta qualidade e performance no mercado brasileiro. Desde 2025, dedicamo-nos a importar e
-                        fornecer componentes automotivos premium, com foco em tecnologia e durabilidade.
+                        A <strong>Full Tech Imports</strong> nasceu da paixão por carros e da necessidade de peças de alta qualidade e performance no mercado brasileiro.
                     </p>
                     <p>
-                        Nossa missão é simples: garantir que seu veículo atinja seu potencial máximo de performance e
-                        segurança, oferecendo um catálogo exclusivo de peças que atendem aos padrões mais rigorosos
-                        internacionais. Trabalhamos apenas com fornecedores renomados, garantindo a procedência de cada
-                        item que vendemos.
+                        Nossa missão é simples: garantir que seu veículo atinja seu potencial máximo de performance e segurança, oferecendo um catálogo exclusivo de peças que atendem aos padrões mais rigorosos internacionais.
                     </p>
                     <p class="highlight-text">
-                        **Qualidade, tecnologia e o melhor desempenho para a sua máquina. Essa é a Full Tech Imports.**
+                        Qualidade, tecnologia e o melhor desempenho para a sua máquina. Essa é a Full Tech Imports.
                     </p>
                 </div>
                 <div class="about-us-image-container">
-                    <img src="{{ url_for('static', filename='img/missao.png') }}"
-                        alt="Imagem de equipe ou peças de alta performance" class="about-us-image">
+                    <img src="{{ url_for('static', filename='img/missao.png') }}" alt="Missão" class="about-us-image">
                 </div>
             </div>
         </div>
     </section>
+
     <main class="conteudo-principal" id="catalogo">
         <aside class="menu-lateral">
             <h2>Categorias</h2>
             <ul>
                 <li class="{% if not categoria_selecionada %}active{% endif %}">
-                    <a class="{% if not categoria_selecionada %}active{% endif %}"
-                        href="{{ url_for('index') }}#catalogo">Todas</a>
+                    <a class="{% if not categoria_selecionada %}active{% endif %}" href="{{ url_for('index') }}#catalogo">Todas</a>
                 </li>
                 {% for cat in categorias %}
                 <li class="{% if categoria_selecionada == cat['id'] %}active{% endif %}">
-                    <a class="{% if categoria_selecionada == cat['id'] %}active{% endif %}"
-                        href="{{ url_for('categoria', categoria_id=cat['id']) }}#catalogo">{{ cat['nome'] }}</a>
+                    <a class="{% if categoria_selecionada == cat['id'] %}active{% endif %}" href="{{ url_for('categoria', categoria_id=cat['id']) }}#catalogo">{{ cat['nome'] }}</a>
                 </li>
                 {% endfor %}
             </ul>
         </aside>
 
         <section style="flex-grow: 1;">
-            <h2 class="section-title">Catálogo de {{ categoria_nome if categoria_nome else 'Produtos' }}</h2>
+            <div class="filtro-ordenacao">
+                <h2 class="section-title">Catálogo de {{ categoria_nome if categoria_nome else 'Produtos' }}</h2>
+                
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <span class="contador-produtos">{{ produtos|length }} produto(s) encontrado(s)</span>
+                    
+                    <select id="ordenar-produtos" onchange="ordenarProdutos()">
+                        <option value="padrao">Ordenar por: Padrão</option>
+                        <option value="menor-preco">Menor Preço</option>
+                        <option value="maior-preco">Maior Preço</option>
+                        <option value="nome-asc">Nome (A-Z)</option>
+                        <option value="nome-desc">Nome (Z-A)</option>
+                    </select>
+                </div>
+            </div>
 
             {% set default_logo_url = url_for('static', filename='img/logo.png') %}
 
-            <div class="produtos">
+            <div id="produtos-container" class="produtos">
                 {% for produto in produtos %}
-                <div class="produto">
-                    {% if produto['imagem'] %}
-                    {% if produto['imagem'].startswith('http') %}
-                    <img src="{{ produto['imagem'] }}" alt="{{ produto['nome'] }}"
-                        onerror="this.onerror=null;this.src='{{ default_logo_url }}';" referrerpolicy="no-referrer" />
-                    {% else %}
-                    <img src="{{ url_for('static', filename=produto['imagem']) }}" alt="{{ produto['nome'] }}"
-                        onerror="this.onerror=null;this.src='{{ default_logo_url }}';" />
-                    {% endif %}
-                    {% else %}
-                    <img src="{{ default_logo_url }}" alt="{{ produto['nome'] }}" />
-                    {% endif %}
+                <div class="produto" data-preco="{{ produto.preco }}" data-nome="{{ produto.nome|lower }}">
+                    <div class="produto-imagem-container">
+                        {% if produto.imagem %}
+                            {% if produto.imagem.startswith('http') %}
+                                <img src="{{ produto.imagem }}" alt="{{ produto.nome }}" 
+                                     onerror="this.parentElement.innerHTML='<div class=\\'sem-imagem\\'><span class=\\'material-icons\\'>image_not_supported</span><span>Imagem não disponível</span></div>'" 
+                                     referrerpolicy="no-referrer" />
+                            {% else %}
+                                {# Corrige o caminho removendo 'static/' se existir #}
+                                {% set imagem_path = produto.imagem.replace('static/', '') %}
+                                <img src="{{ url_for('static', filename=imagem_path) }}" alt="{{ produto.nome }}" 
+                                     onerror="this.parentElement.innerHTML='<div class=\\'sem-imagem\\'><span class=\\'material-icons\\'>image_not_supported</span><span>Imagem não disponível</span></div>'" />
+                            {% endif %}
+                        {% else %}
+                            <div class="sem-imagem">
+                                <span class="material-icons">image_not_supported</span>
+                                <span>Sem imagem</span>
+                            </div>
+                        {% endif %}
+                    </div>
 
-                    <h3>{{ produto['nome'] }}</h3>
+                    <h3>{{ produto.nome }}</h3>
 
                     <div class="estrelas">
-                        <span class="star-filled">★</span><span class="star-filled">★</span><span
-                            class="star-filled">★</span><span class="star-filled">★</span><span
-                            class="star-empty">★</span>
+                        <span class="star-filled">★</span><span class="star-filled">★</span>
+                        <span class="star-filled">★</span><span class="star-filled">★</span>
+                        <span class="star-empty">★</span>
                     </div>
 
                     <div class="preco-info">
-                        {% if produto['descricao'] %}
-                        <p style="font-size: 14px; margin-bottom: 5px;">{{ produto['descricao'][:50] }}...</p>
-                        {% endif %}
-                        <p class="preco-regular">R$ {{ "%.2f"|format(produto['preco']) }}</p>
-                        {% if produto['preco_pix'] %}
+                        <p class="preco-regular">R$ {{ "%.2f"|format(produto.preco)|replace('.', ',') }}</p>
+
+                        {% if produto.preco_pix %}
                         <div class="pix-box">
-                            <p>À vista no PIX: <strong>R$ {{ "%.2f"|format(produto['preco_pix']) }}</strong></p>
-                            <p class="pix-economia">Economize R$ {{ "%.2f"|format(produto['preco'] -
-                                produto['preco_pix']) }}</p>
+                            <p>À vista no PIX: <strong>R$ {{ "%.2f"|format(produto.preco_pix)|replace('.', ',') }}</strong></p>
+                            <p class="pix-economia">Economize R$ {{ "%.2f"|format(produto.preco - produto.preco_pix)|replace('.', ',') }}</p>
                         </div>
                         {% endif %}
                     </div>
 
-                    <form action="{{ url_for('add_to_cart', produto_id=produto['id']) }}" method="post">
-                        <button type="submit" class="btn-add-carrinho">Adicionar ao Carrinho</button>
+                    {% if produto.descricao %}
+                    <button class="btn-desc" onclick="toggleDescricao(this)">Ver Descrição</button>
+                    <p class="descricao">{{ produto.descricao }}</p>
+                    {% endif %}
+
+                    <form action="{{ url_for('add_to_cart', produto_id=produto.id) }}" method="post">
+                        <button type="submit" class="btn-add-carrinho">
+                            <span class="material-icons" style="vertical-align: middle; margin-right: 5px;">add_shopping_cart</span>
+                            Adicionar ao Carrinho
+                        </button>
                     </form>
                 </div>
                 {% endfor %}
 
                 {% if not produtos %}
-                <p>Sem produtos nessa categoria por enquanto.</p>
+                <div class="sem-produtos">
+                    <p>Sem produtos nessa categoria por enquanto.</p>
+                </div>
                 {% endif %}
             </div>
         </section>
@@ -214,8 +338,7 @@
                     <span>⚙️</span>
                     <h3>Full Tech Imports</h3>
                 </div>
-                <p>A mais alta tecnologia em peças importadas para o seu veículo. Qualidade e performance garantidas.
-                </p>
+                <p>A mais alta tecnologia em peças importadas para o seu veículo. Qualidade e performance garantidas.</p>
                 <p>&copy; 2025 Full Tech Imports</p>
             </div>
             <div class="footer-section">
@@ -245,16 +368,63 @@
     <script>
         function toggleMenu(open) {
             const menu = document.getElementById("sideMenu");
-            if (open) {
-                menu.classList.add("open");
-                document.body.style.overflow = 'hidden';
+            menu.classList.toggle("open", open);
+            document.body.style.overflow = open ? 'hidden' : 'auto';
+        }
+
+        function toggleDescricao(btn) {
+            const desc = btn.nextElementSibling;
+            if (desc.style.display === "block") {
+                desc.style.display = "none";
+                btn.textContent = "Ver Descrição";
             } else {
-                menu.classList.remove("open");
-                document.body.style.overflow = 'auto';
+                desc.style.display = "block";
+                btn.textContent = "Ocultar Descrição";
             }
         }
+
+        // Função para ordenar produtos
+        function ordenarProdutos() {
+            const select = document.getElementById('ordenar-produtos');
+            const criterio = select.value;
+            const container = document.getElementById('produtos-container');
+            const produtos = Array.from(container.getElementsByClassName('produto'));
+
+            produtos.sort((a, b) => {
+                switch(criterio) {
+                    case 'menor-preco':
+                        return parseFloat(a.dataset.preco) - parseFloat(b.dataset.preco);
+                    case 'maior-preco':
+                        return parseFloat(b.dataset.preco) - parseFloat(a.dataset.preco);
+                    case 'nome-asc':
+                        return a.dataset.nome.localeCompare(b.dataset.nome);
+                    case 'nome-desc':
+                        return b.dataset.nome.localeCompare(a.dataset.nome);
+                    default:
+                        return 0; // Mantém a ordem padrão
+                }
+            });
+
+            // Remove todos os produtos do container
+            while (container.firstChild) {
+                container.removeChild(container.firstChild);
+            }
+            produtos.forEach(produto => container.appendChild(produto));
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Verificando imagens dos produtos...');
+            const imagens = document.querySelectorAll('.produto-imagem-container img');
+            imagens.forEach((img, index) => {
+                console.log(`Imagem ${index + 1}:`, img.src);
+                img.addEventListener('error', function() {
+                    console.log(`Erro ao carregar imagem ${index + 1}:`, this.src);
+                });
+                img.addEventListener('load', function() {
+                    console.log(`Imagem ${index + 1} carregada com sucesso:`, this.src);
+                });
+            });
+        });
     </script>
-
 </body>
-
 </html>

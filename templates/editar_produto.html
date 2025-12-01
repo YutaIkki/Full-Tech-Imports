@@ -1,169 +1,748 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Produto</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <title>Editar Produto - Full Tech Imports</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
     <style>
-        body {
-            font-family: "Poppins", sans-serif;
-            background: #f5f7ff;
-            margin: 0;
-            padding: 0;
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --primary-dark: #3a0ca3;
+            --secondary: #4cc9f0;
+            --success: #4ade80;
+            --warning: #fbbf24;
+            --danger: #f87171;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --border: #e2e8f0;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f1f5f9;
+            --bg-tertiary: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-inverse: #ffffff;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --card-bg: #ffffff;
+            --sidebar-bg: linear-gradient(180deg, var(--primary-dark) 0%, var(--primary) 100%);
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
 
-        header {
-            background: #000066;
+        [data-theme="dark"] {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4338ca;
+            --secondary: #60a5fa;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #f8fafc;
+            --light: #1e293b;
+            --gray: #94a3b8;
+            --border: #334155;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-inverse: #0f172a;
+            --shadow: rgba(0, 0, 0, 0.3);
+            --card-bg: #1e293b;
+            --sidebar-bg: linear-gradient(180deg, #1e1b4b 0%, var(--primary-dark) 100%);
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+            --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        .dashboard-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar-bg);
+            color: var(--text-inverse);
+            padding: 24px 0;
+            box-shadow: var(--card-shadow);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 0 24px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-header h2 .material-icons {
+            font-size: 24px;
+            color: var(--secondary);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0 16px;
+        }
+
+        .nav-item {
+            margin-bottom: 4px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.15);
             color: white;
-            padding: 15px 40px;
+            transform: translateX(4px);
+        }
+
+        .nav-link .material-icons {
+            font-size: 20px;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 24px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 32px;
+            background: var(--card-bg);
+            padding: 20px 24px;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
         }
 
-        header a {
+        .header h1 {
+            color: var(--primary);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .theme-toggle {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            width: 48px;
+            height: 24px;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 0 3px;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--primary);
+        }
+
+        .theme-toggle::before {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary);
+            transition: all 0.3s ease;
+            left: 3px;
+        }
+
+        [data-theme="dark"] .theme-toggle::before {
+            transform: translateX(24px);
+            background: var(--warning);
+        }
+
+        .theme-icon {
+            position: absolute;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .sun-icon {
+            left: 6px;
+            color: var(--warning);
+        }
+
+        .moon-icon {
+            right: 6px;
+            color: var(--primary-light);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: white;
-            text-decoration: none;
             font-weight: 600;
+            font-size: 1rem;
         }
 
-        .container {
-            max-width: 800px;
-            margin: 50px auto;
-            background: white;
-            padding: 40px 50px;
-            border-radius: 16px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        .form-container {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 32px;
+            border: 1px solid var(--border);
         }
 
-        h2 {
-            text-align: center;
-            color: #000066;
-            margin-bottom: 30px;
+        .form-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 24px;
         }
 
-        form {
+        .form-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px 25px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
         }
 
-        label {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 5px;
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning), #f59e0b);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 24px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+
+        .mobile-menu-btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .sidebar-overlay.active {
             display: block;
         }
 
-        input,
-        select,
-        textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 14px;
-            box-sizing: border-box;
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 70px;
-        }
-
-        .full-width {
-            grid-column: span 2;
-        }
-
-        button {
-            grid-column: span 2;
+        .current-image {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             padding: 12px;
-            background: linear-gradient(90deg, #001a80, #0066ff);
-            color: white;
-            font-weight: 600;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: 0.3s;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin-top: 8px;
         }
 
-        button:hover {
-            background: linear-gradient(90deg, #0033cc, #0080ff);
+        .current-image img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 6px;
         }
 
-        footer {
-            text-align: center;
-            margin-top: 50px;
-            color: #555;
-            font-size: 13px;
+        .image-info {
+            flex: 1;
+        }
+
+        .image-name {
+            font-weight: 500;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+        }
+
+        .image-text {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-menu-btn {
+                display: flex;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 16px;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+                padding: 16px;
+            }
+            
+            .header-actions {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .form-container {
+                padding: 16px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease-out;
         }
     </style>
 </head>
-
 <body>
-    <header>
-        <h1>Editar Produto</h1>
-        <a href="{{ url_for('dashboard') }}">Voltar ao Dashboard</a>
-    </header>
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <div class="logo-icon">
+                        <span class="material-icons">dashboard</span>
+                    </div>
+                    <h2>Dashboard</h2>
+                </div>
+            </div>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="{{ url_for('dashboard') }}" class="nav-link">
+                            <span class="material-icons">space_dashboard</span>
+                            Visão Geral
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('adicionar_produto') }}" class="nav-link">
+                            <span class="material-icons">add_box</span>
+                            Adicionar Produto
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('adicionar_fornecedor') }}" class="nav-link">
+                            <span class="material-icons">business_center</span>
+                            Fornecedores
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('index') }}" class="nav-link">
+                            <span class="material-icons">store</span>
+                            Voltar à Loja
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('logout') }}" class="nav-link">
+                            <span class="material-icons">logout</span>
+                            Sair
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
 
-    <main>
-        <div class="container">
-            <h2>Atualizar Produto</h2>
+        <!-- Overlay para mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-            <form action="{{ url_for('editar_produto', produto_id=produto.id) }}" method="POST">
+        <!-- Conteúdo Principal -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header fade-in-up">
                 <div>
-                    <label for="nome">Nome:</label>
-                    <input type="text" id="nome" name="nome" value="{{ produto.nome }}" required>
+                    <h1>Editar Produto</h1>
+                    <p style="color: var(--text-secondary); margin-top: 4px;">Atualize as informações do produto</p>
                 </div>
-
-                <div>
-                    <label for="descricao">Descrição:</label>
-                    <textarea id="descricao" name="descricao" required>{{ produto.descricao }}</textarea>
+                
+                <div class="header-actions">
+                    <!-- Botão de Alternar Tema -->
+                    <div class="theme-toggle" id="themeToggle" title="Alternar tema">
+                        <span class="material-icons theme-icon sun-icon">light_mode</span>
+                        <span class="material-icons theme-icon moon-icon">dark_mode</span>
+                    </div>
+                    
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">
+                        <span class="material-icons">menu</span>
+                    </button>
+                    
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            {{ session.usuario_nome[0] if session.usuario_nome else 'A' }}
+                        </div>
+                        <div>
+                            <div style="font-weight: 600;">{{ session.usuario_nome }}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary);">Administrador</div>
+                        </div>
+                    </div>
                 </div>
+            </header>
 
-                <div>
-                    <label for="preco">Preço:</label>
-                    <input type="number" id="preco" name="preco" value="{{ produto.preco }}" step="0.01" required>
-                </div>
+            <!-- Formulário -->
+            <div class="form-container fade-in-up">
+                <h2 class="form-title">Informações do Produto</h2>
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="nome" class="form-label">Nome do Produto</label>
+                            <input type="text" id="nome" name="nome" class="form-input" value="{{ produto.nome }}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="categoria" class="form-label">Categoria</label>
+                            <select id="categoria" name="categoria" class="form-select" required>
+                                <option value="">Selecione uma categoria</option>
+                                {% for categoria in categorias %}
+                                <option value="{{ categoria.id }}" {% if categoria.id == produto.categoria_id %}selected{% endif %}>
+                                    {{ categoria.nome }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="preco" class="form-label">Preço (R$)</label>
+                            <input type="number" id="preco" name="preco" step="0.01" min="0" class="form-input" value="{{ produto.preco }}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="preco_pix" class="form-label">Preço PIX (R$)</label>
+                            <input type="number" id="preco_pix" name="preco_pix" step="0.01" min="0" class="form-input" value="{{ produto.preco_pix }}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="estoque" class="form-label">Estoque</label>
+                            <input type="number" id="estoque" name="estoque" min="0" class="form-input" value="{{ produto.estoque }}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="estoque_minimo" class="form-label">Estoque Mínimo</label>
+                            <input type="number" id="estoque_minimo" name="estoque_minimo" min="0" class="form-input" value="{{ produto.estoque_minimo }}" required>
+                        </div>
+                        
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label for="descricao" class="form-label">Descrição</label>
+                            <textarea id="descricao" name="descricao" class="form-textarea">{{ produto.descricao }}</textarea>
+                        </div>
+                        
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label for="imagem" class="form-label">Imagem do Produto</label>
+                            <input type="file" id="imagem" name="imagem" accept="image/*" class="form-input">
+                            
+                            {% if produto.imagem %}
+                            <div class="current-image">
+                                {% if produto.imagem.startswith('http') %}
+                                    <img src="{{ produto.imagem }}" alt="Imagem atual do produto">
+                                {% else %}
+                                    <img src="{{ url_for('static', filename=produto.imagem) }}" alt="Imagem atual do produto">
+                                {% endif %}
+                                <div class="image-info">
+                                    <div class="image-name">Imagem atual</div>
+                                    <div class="image-text">Deixe em branco para manter a imagem atual</div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="material-icons">save</span>
+                            Atualizar Produto
+                        </button>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                            <span class="material-icons">arrow_back</span>
+                            Voltar ao Dashboard
+                        </a>
+                        <a href="{{ url_for('remover_produto', produto_id=produto.id) }}" class="btn btn-warning" onclick="return confirm('Tem certeza que deseja remover este produto?')">
+                            <span class="material-icons">delete</span>
+                            Remover Produto
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
 
-                <div>
-                    <label for="preco_pix">Preço com PIX:</label>
-                    <input type="number" id="preco_pix" name="preco_pix" value="{{ produto.preco_pix }}" step="0.01" required>
-                </div>
+    <script>
+        // Sistema de Tema Escuro/Claro
+        class ThemeManager {
+            constructor() {
+                this.themeToggle = document.getElementById('themeToggle');
+                this.currentTheme = localStorage.getItem('theme') || 'light';
+                this.init();
+            }
 
-                <div>
-                    <label for="estoque">Estoque:</label>
-                    <input type="number" id="estoque" name="estoque" value="{{ produto.estoque }}" required>
-                </div>
+            init() {
+                this.applyTheme(this.currentTheme);
+                this.themeToggle.addEventListener('click', () => this.toggleTheme());
+            }
 
-                <div>
-                    <label for="estoque_minimo">Estoque Mínimo:</label>
-                    <input type="number" id="estoque_minimo" name="estoque_minimo" value="{{ produto.estoque_minimo }}" required>
-                </div>
+            applyTheme(theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+                this.currentTheme = theme;
+            }
 
-                <div class="full-width">
-                    <label for="categoria">Categoria:</label>
-                    <select id="categoria" name="categoria" required>
-                        {% for categoria in categorias %}
-                        <option value="{{ categoria.id }}" {% if categoria.id == produto.categoria_id %}selected{% endif %}>
-                            {{ categoria.nome }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
+            toggleTheme() {
+                const newTheme = this.currentTheme === 'light' ? 'dark' : 'light';
+                this.applyTheme(newTheme);
+            }
+        }
 
-                <button type="submit">Atualizar Produto</button>
-            </form>
-        </div>
-    </main>
+        // Inicializar gerenciador de tema
+        const themeManager = new ThemeManager();
 
-    <footer>
-        <p>&copy; 2025 Full Tech Imports</p>
-    </footer>
+        // Menu Mobile
+        document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('mobile-open');
+            overlay.classList.toggle('active');
+        });
+
+        // Fechar menu ao clicar no overlay
+        document.getElementById('sidebarOverlay')?.addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.remove('mobile-open');
+            this.classList.remove('active');
+        });
+
+        // Fechar menu ao clicar em um link (mobile)
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                document.getElementById('sidebar').classList.remove('mobile-open');
+                document.getElementById('sidebarOverlay').classList.remove('active');
+            });
+        });
+
+        // Animações de entrada
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        // Observar elementos com animação
+        document.querySelectorAll('.fade-in-up').forEach(el => {
+            el.style.animationPlayState = 'paused';
+            observer.observe(el);
+        });
+    </script>
 </body>
-
 </html>

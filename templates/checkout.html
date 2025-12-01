@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Finalizar Pedido</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --transition: all 0.2s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.5;
+            min-height: 100vh;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-weight: 600;
+            font-size: 1.4rem;
+            margin-bottom: 4px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.85rem;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .section {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 8px;
+            color: var(--primary);
+        }
+
+        .resumo {
+            background: var(--light);
+            border-radius: var(--border-radius);
+            padding: 16px;
+        }
+
+        .resumo-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .resumo-item:last-child {
+            border-bottom: none;
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--dark);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1.5px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        .payment-options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .payment-option {
+            border: 1.5px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            padding: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .payment-option:hover {
+            border-color: var(--primary);
+        }
+
+        .payment-option.selected {
+            border-color: var(--primary);
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .payment-option input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .checkmark {
+            height: 18px;
+            width: 18px;
+            background-color: white;
+            border-radius: 50%;
+            border: 2px solid var(--gray);
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+        .payment-option input:checked ~ .checkmark {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .checkmark:after {
+            content: "";
+            display: none;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: white;
+        }
+
+        .payment-option input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        .payment-info {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .payment-title {
+            font-weight: 500;
+            margin-bottom: 4px;
+            font-size: 0.95rem;
+        }
+
+        .payment-desc {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .payment-icon {
+            margin-left: 10px;
+            font-size: 1.2rem;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        .btn-confirmar {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 8px;
+        }
+
+        .btn-confirmar:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary) 100%);
+            transform: translateY(-1px);
+        }
+
+        .btn-confirmar:active {
+            transform: translateY(0);
+        }
+
+        .btn-confirmar i {
+            margin-left: 8px;
+        }
+
+        .secure-notice {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 0.8rem;
+            color: var(--gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .secure-notice i {
+            margin-right: 6px;
+            color: #4bb543;
+        }
+
+        .address-section {
+            margin-bottom: 25px;
+        }
+
+        .address-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--dark);
+            border: 1.5px solid var(--light-gray);
+            padding: 10px 15px;
+            border-radius: var(--border-radius);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            flex: 1;
+        }
+
+        .btn-secondary:hover {
+            background: var(--light);
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* ESTILOS PARA SELEÇÃO DE ENDEREÇO */
+        .address-selection {
+            margin-bottom: 20px;
+        }
+
+        .address-option {
+            border: 1.5px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            padding: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .address-option:hover {
+            border-color: var(--primary);
+        }
+
+        .address-option.selected {
+            border-color: var(--primary);
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .address-option input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .address-checkmark {
+            height: 18px;
+            width: 18px;
+            background-color: white;
+            border-radius: 50%;
+            border: 2px solid var(--gray);
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .address-option input:checked ~ .address-checkmark {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .address-checkmark:after {
+            content: "";
+            display: none;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: white;
+        }
+
+        .address-option input:checked ~ .address-checkmark:after {
+            display: block;
+        }
+
+        .address-details {
+            flex-grow: 1;
+        }
+
+        .address-title {
+            font-weight: 500;
+            margin-bottom: 4px;
+            font-size: 0.95rem;
+            color: var(--dark);
+        }
+
+        .address-line {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-bottom: 2px;
+        }
+
+        .address-badge {
+            background: var(--primary);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            margin-left: 8px;
+        }
+
+        .new-address-section {
+            background: var(--light);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .new-address-section.active {
+            display: block;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+                align-items: flex-start;
+            }
+            
+            .container {
+                max-width: 100%;
+            }
+            
+            .content {
+                padding: 16px;
+            }
+            
+            .header {
+                padding: 16px;
+            }
+            
+            .header h1 {
+                font-size: 1.3rem;
+            }
+            
+            .payment-option {
+                padding: 14px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .address-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Finalizar Pedido</h1>
+        <p>Complete suas informações para finalizar a compra</p>
+    </div>
+
+    <div class="content">
+        <form method="POST" action="/checkout/prosseguir" id="checkoutForm">
+            <!-- SEÇÃO DE ENDEREÇO (mantida do código anterior) -->
+            <div class="section">
+                <h2 class="section-title"><i class="fas fa-map-marker-alt"></i> Endereço de Entrega</h2>
+                
+                <div class="address-selection">
+                    {% if enderecos %}
+                    <div class="address-options">
+                        {% for endereco in enderecos %}
+                        <label class="address-option {% if endereco.principal %}selected{% endif %}">
+                            <input type="radio" name="endereco_id" value="{{ endereco.id }}" 
+                                   {% if endereco.principal %}checked{% endif %} 
+                                   onchange="selecionarEndereco('cadastrado', {{ endereco.id }})">
+                            <span class="address-checkmark"></span>
+                            <div class="address-details">
+                                <div class="address-title">
+                                    {{ endereco.logradouro }}, {{ endereco.numero }}
+                                    {% if endereco.principal %}<span class="address-badge">Principal</span>{% endif %}
+                                </div>
+                                <div class="address-line">{{ endereco.bairro }}, {{ endereco.cidade }} - {{ endereco.estado }}</div>
+                                <div class="address-line">CEP: {{ endereco.cep }}</div>
+                                {% if endereco.complemento %}
+                                <div class="address-line">Complemento: {{ endereco.complemento }}</div>
+                                {% endif %}
+                            </div>
+                        </label>
+                        {% endfor %}
+                        
+                        <label class="address-option">
+                            <input type="radio" name="endereco_id" value="novo" onchange="selecionarEndereco('novo')">
+                            <span class="address-checkmark"></span>
+                            <div class="address-details">
+                                <div class="address-title">Usar um endereço diferente</div>
+                                <div class="address-line">Preencher manualmente um novo endereço de entrega</div>
+                            </div>
+                        </label>
+                    </div>
+                    {% else %}
+                    <div class="address-option selected">
+                        <input type="radio" name="endereco_id" value="novo" checked onchange="selecionarEndereco('novo')">
+                        <span class="address-checkmark"></span>
+                        <div class="address-details">
+                            <div class="address-title">Preencher endereço de entrega</div>
+                            <div class="address-line">Informe o endereço para entrega do pedido</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- FORMULÁRIO DE NOVO ENDEREÇO -->
+                <div class="new-address-section {% if not enderecos %}active{% endif %}" id="novoEnderecoSection">
+                    <div class="address-section">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="cep">CEP</label>
+                                <input type="text" id="cep" name="cep" class="form-input" placeholder="00000-000">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="numero">Número</label>
+                                <input type="text" id="numero" name="numero" class="form-input" placeholder="123">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="logradouro">Logradouro</label>
+                            <input type="text" id="logradouro" name="logradouro" class="form-input" placeholder="Rua, Avenida, etc.">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="complemento">Complemento</label>
+                            <input type="text" id="complemento" name="complemento" class="form-input" placeholder="Apartamento, Bloco, etc.">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="bairro">Bairro</label>
+                            <input type="text" id="bairro" name="bairro" class="form-input" placeholder="Seu bairro">
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="cidade">Cidade</label>
+                                <input type="text" id="cidade" name="cidade" class="form-input" placeholder="Sua cidade">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="estado">Estado</label>
+                                <select id="estado" name="estado" class="form-input">
+                                    <option value="">Selecione</option>
+                                    <option value="AC">Acre</option>
+                                    <option value="AL">Alagoas</option>
+                                    <option value="AP">Amapá</option>
+                                    <option value="AM">Amazonas</option>
+                                    <option value="BA">Bahia</option>
+                                    <option value="CE">Ceará</option>
+                                    <option value="DF">Distrito Federal</option>
+                                    <option value="ES">Espírito Santo</option>
+                                    <option value="GO">Goiás</option>
+                                    <option value="MA">Maranhão</option>
+                                    <option value="MT">Mato Grosso</option>
+                                    <option value="MS">Mato Grosso do Sul</option>
+                                    <option value="MG">Minas Gerais</option>
+                                    <option value="PA">Pará</option>
+                                    <option value="PB">Paraíba</option>
+                                    <option value="PR">Paraná</option>
+                                    <option value="PE">Pernambuco</option>
+                                    <option value="PI">Piauí</option>
+                                    <option value="RJ">Rio de Janeiro</option>
+                                    <option value="RN">Rio Grande do Norte</option>
+                                    <option value="RS">Rio Grande do Sul</option>
+                                    <option value="RO">Rondônia</option>
+                                    <option value="RR">Roraima</option>
+                                    <option value="SC">Santa Catarina</option>
+                                    <option value="SP">São Paulo</option>
+                                    <option value="SE">Sergipe</option>
+                                    <option value="TO">Tocantins</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="address-actions">
+                            <button type="button" class="btn-secondary" id="btnBuscarCep">
+                                <i class="fas fa-search"></i> Buscar CEP
+                            </button>
+                            <button type="button" class="btn-secondary" id="btnLimparEndereco">
+                                <i class="fas fa-eraser"></i> Limpar
+                            </button>
+                            <button type="button" class="btn-secondary" id="btnCalcularFrete">
+                                <i class="fas fa-truck"></i> Calcular Frete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO DE RESUMO DO PEDIDO -->
+            <div class="section">
+                <h2 class="section-title"><i class="fas fa-receipt"></i> Resumo do Pedido</h2>
+                <div class="resumo">
+                    <div class="resumo-item">
+                        <span>Subtotal</span>
+                        <span>R$ <span id="subtotal">{{ total|brl }}</span></span>
+                    </div>
+                    <div class="resumo-item">
+                        <span>Frete</span>
+                        <span id="frete-display">
+                            {% if frete %}
+                                R$ {{ frete|brl }}
+                            {% else %}
+                                Não calculado
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="resumo-item">
+                        <span>Total</span>
+                        <span>R$ <span id="total-final">{{ total_final|brl }}</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO DE PAGAMENTO - ADICIONANDO AS OPÇÕES DO SEU EXEMPLO -->
+            <div class="section">
+                <h2 class="section-title"><i class="fas fa-credit-card"></i> Forma de Pagamento</h2>
+                
+                <div class="payment-options">
+                    <!-- PIX -->
+                    <label class="payment-option selected">
+                        <input type="radio" name="pg" value="pix" checked required>
+                        <span class="checkmark"></span>
+                        <div class="payment-info">
+                            <div class="payment-title">PIX</div>
+                            <div class="payment-desc">Pagamento instantâneo - 5% de desconto</div>
+                        </div>
+                        <div class="payment-icon">
+                            <i class="fas fa-qrcode"></i>
+                        </div>
+                    </label>
+                    
+                    <!-- CARTÃO DE CRÉDITO -->
+                    <label class="payment-option">
+                        <input type="radio" name="pg" value="cartao">
+                        <span class="checkmark"></span>
+                        <div class="payment-info">
+                            <div class="payment-title">Cartão de Crédito</div>
+                            <div class="payment-desc">Parcelamento em 6x sem juros</div>
+                        </div>
+                        <div class="payment-icon">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                    </label>
+                    
+                    <!-- BOLETO BANCÁRIO -->
+                    <label class="payment-option">
+                        <input type="radio" name="pg" value="boleto">
+                        <span class="checkmark"></span>
+                        <div class="payment-info">
+                            <div class="payment-title">Boleto Bancário</div>
+                            <div class="payment-desc">Pagamento em até 3 dias úteis</div>
+                        </div>
+                        <div class="payment-icon">
+                            <i class="fas fa-barcode"></i>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-confirmar" id="btnFinalizar">
+                Finalizar Pedido <i class="fas fa-arrow-right"></i>
+            </button>
+            
+            <div class="secure-notice">
+                <i class="fas fa-lock"></i> Pagamento 100% seguro e criptografado
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Variável para armazenar endereços
+    let enderecosCadastrados = {{ enderecos|tojson|default('[]') }};
+
+    // Função para selecionar tipo de endereço
+    function selecionarEndereco(tipo, enderecoId = null) {
+        const novoEnderecoSection = document.getElementById('novoEnderecoSection');
+        
+        if (tipo === 'cadastrado' && enderecoId) {
+            // Esconder formulário de novo endereço
+            novoEnderecoSection.classList.remove('active');
+            
+            // Preencher campos hidden com dados do endereço selecionado
+            const endereco = enderecosCadastrados.find(e => e.id === enderecoId);
+            if (endereco) {
+                preencherCamposEndereco(endereco);
+                calcularFrete(); // Calcular frete automaticamente
+            }
+        } else {
+            // Mostrar formulário de novo endereço
+            novoEnderecoSection.classList.add('active');
+            limparCamposEndereco();
+            zerarFrete();
+        }
+    }
+
+    // Função para zerar o frete
+    function zerarFrete() {
+        document.getElementById('frete-display').textContent = 'Não calculado';
+        atualizarTotalFinal(0);
+        
+        // Limpar o frete da sessão também
+        fetch('/limpar_frete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            }
+        }).catch(error => {
+            console.error('Erro ao limpar frete:', error);
+        });
+    }
+
+    // Função para preencher campos com dados do endereço
+    function preencherCamposEndereco(endereco) {
+        document.getElementById('cep').value = endereco.cep || '';
+        document.getElementById('logradouro').value = endereco.logradouro || '';
+        document.getElementById('numero').value = endereco.numero || '';
+        document.getElementById('complemento').value = endereco.complemento || '';
+        document.getElementById('bairro').value = endereco.bairro || '';
+        document.getElementById('cidade').value = endereco.cidade || '';
+        document.getElementById('estado').value = endereco.estado || '';
+    }
+
+    // Função para limpar campos de endereço
+    function limparCamposEndereco() {
+        document.getElementById('cep').value = '';
+        document.getElementById('logradouro').value = '';
+        document.getElementById('numero').value = '';
+        document.getElementById('complemento').value = '';
+        document.getElementById('bairro').value = '';
+        document.getElementById('cidade').value = '';
+        document.getElementById('estado').value = '';
+    }
+
+    // Adiciona interatividade para as opções de pagamento
+    document.addEventListener('DOMContentLoaded', function() {
+        const paymentOptions = document.querySelectorAll('.payment-option');
+        
+        paymentOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                paymentOptions.forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                this.classList.add('selected');
+                const radio = this.querySelector('input[type="radio"]');
+                radio.checked = true;
+            });
+        });
+        
+        // Buscar CEP via API
+        document.getElementById('btnBuscarCep').addEventListener('click', function() {
+            const cep = document.getElementById('cep').value.replace(/\D/g, '');
+            
+            if (cep.length !== 8) {
+                alert('Por favor, digite um CEP válido com 8 dígitos.');
+                return;
+            }
+            
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Buscando...';
+            this.disabled = true;
+            
+            fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.erro) {
+                        alert('CEP não encontrado. Verifique o número digitado.');
+                    } else {
+                        document.getElementById('logradouro').value = data.logradouro || '';
+                        document.getElementById('bairro').value = data.bairro || '';
+                        document.getElementById('cidade').value = data.localidade || '';
+                        document.getElementById('estado').value = data.uf || '';
+                        document.getElementById('numero').focus();
+                        
+                        // Calcular frete automaticamente após buscar CEP
+                        calcularFrete();
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar CEP:', error);
+                    alert('Erro ao buscar CEP. Tente novamente.');
+                })
+                .finally(() => {
+                    this.innerHTML = '<i class="fas fa-search"></i> Buscar CEP';
+                    this.disabled = false;
+                });
+        });
+        
+        // Limpar endereço
+        document.getElementById('btnLimparEndereco').addEventListener('click', function() {
+            limparCamposEndereco();
+            zerarFrete();
+        });
+        
+        // Calcular frete manualmente
+        document.getElementById('btnCalcularFrete').addEventListener('click', function() {
+            calcularFrete();
+        });
+        
+        // Formatação do CEP
+        document.getElementById('cep').addEventListener('input', function() {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length > 5) {
+                value = value.substring(0, 5) + '-' + value.substring(5, 8);
+            }
+            this.value = value;
+        });
+        
+        // Calcular frete quando o CEP for alterado e tiver 8 dígitos
+        document.getElementById('cep').addEventListener('blur', function() {
+            const cep = this.value.replace(/\D/g, '');
+            if (cep.length === 8) {
+                calcularFrete();
+            }
+        });
+        
+        // Inicializar corretamente baseado nos endereços disponíveis
+        {% if enderecos %}
+            const enderecoPrincipal = enderecosCadastrados.find(e => e.principal);
+            if (enderecoPrincipal) {
+                const radioPrincipal = document.querySelector(`input[value="${enderecoPrincipal.id}"]`);
+                if (radioPrincipal) {
+                    radioPrincipal.checked = true;
+                    radioPrincipal.closest('.address-option').classList.add('selected');
+                    selecionarEndereco('cadastrado', enderecoPrincipal.id);
+                }
+            } else {
+                const radioNovo = document.querySelector('input[value="novo"]');
+                if (radioNovo) {
+                    radioNovo.checked = true;
+                    selecionarEndereco('novo');
+                }
+            }
+        {% else %}
+            const radioNovo = document.querySelector('input[value="novo"]');
+            if (radioNovo) {
+                radioNovo.checked = true;
+                selecionarEndereco('novo');
+            }
+        {% endif %}
+
+        // VALIDAÇÃO DO FORMULÁRIO
+        document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Verificar se um endereço foi selecionado
+            const enderecoSelecionado = document.querySelector('input[name="endereco_id"]:checked');
+            if (!enderecoSelecionado) {
+                alert('Por favor, selecione um endereço de entrega.');
+                return;
+            }
+            
+            // Se for endereço novo, validar campos obrigatórios
+            if (enderecoSelecionado.value === 'novo') {
+                const cep = document.getElementById('cep').value.trim();
+                const logradouro = document.getElementById('logradouro').value.trim();
+                const numero = document.getElementById('numero').value.trim();
+                const bairro = document.getElementById('bairro').value.trim();
+                const cidade = document.getElementById('cidade').value.trim();
+                const estado = document.getElementById('estado').value.trim();
+                
+                if (!cep || !logradouro || !numero || !bairro || !cidade || !estado) {
+                    alert('Por favor, preencha todos os campos obrigatórios do endereço.');
+                    return;
+                }
+                
+                if (cep.replace(/\D/g, '').length !== 8) {
+                    alert('Por favor, digite um CEP válido.');
+                    return;
+                }
+            }
+            
+            // Verificar se o frete foi calculado
+            const freteDisplay = document.getElementById('frete-display').textContent;
+            if (freteDisplay.includes('Não calculado') || freteDisplay.includes('Erro')) {
+                alert('Por favor, calcule o frete antes de prosseguir.');
+                return;
+            }
+            
+            // Verificar se método de pagamento foi selecionado
+            const metodoPagamento = document.querySelector('input[name="pg"]:checked');
+            if (!metodoPagamento) {
+                alert('Por favor, selecione uma forma de pagamento.');
+                return;
+            }
+            
+            // Se todas as validações passarem, enviar o formulário
+            this.submit();
+        });
+    });
+
+    // Função para calcular frete
+    function calcularFrete() {
+        const cep = document.getElementById('cep').value.replace(/\D/g, '');
+        const btnCalcular = document.getElementById('btnCalcularFrete');
+        
+        if (cep.length !== 8) {
+            alert('Por favor, digite um CEP válido com 8 dígitos para calcular o frete.');
+            return;
+        }
+        
+        btnCalcular.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calculando...';
+        btnCalcular.disabled = true;
+        document.getElementById('frete-display').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calculando...';
+        
+        fetch('/calcular_frete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `cep=${cep}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.erro) {
+                alert('Erro ao calcular frete: ' + data.erro);
+                document.getElementById('frete-display').textContent = 'Erro no cálculo';
+            } else {
+                const frete = data.frete;
+                document.getElementById('frete-display').textContent = `R$ ${frete.toFixed(2).replace('.', ',')}`;
+                atualizarTotalFinal(frete);
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao calcular frete:', error);
+            alert('Erro ao calcular frete. Tente novamente.');
+            document.getElementById('frete-display').textContent = 'Erro no cálculo';
+        })
+        .finally(() => {
+            btnCalcular.innerHTML = '<i class="fas fa-truck"></i> Calcular Frete';
+            btnCalcular.disabled = false;
+        });
+    }
+
+    // Função para atualizar o total final
+    function atualizarTotalFinal(frete) {
+        const subtotal = {{ total }};
+        const totalFinal = subtotal + frete;
+        document.getElementById('total-final').textContent = totalFinal.toFixed(2).replace('.', ',');
+    }
+</script>
+
+</body>
+</html>

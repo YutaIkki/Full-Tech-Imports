@@ -32,6 +32,7 @@
             --cor-texto-escuro: #000;
             --cor-borda-cinza: #ccc;
             --cor-azul-claro-botao: #3060C0;
+            --cor-desabilitado: #95a5a6;
         }
 
         header {
@@ -123,6 +124,14 @@
             font-size: 1.5rem;
             margin-left: 15px;
             transition: color 0.2s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+        }
+
+        .btn-remover-lixeira .material-icons {
+            font-size: 1.5rem;
         }
 
         .btn-remover-lixeira:hover {
@@ -360,11 +369,48 @@
             font-size: 0.95rem;
             font-weight: bold;
             text-transform: uppercase;
-            transition: background-color 0.2s;
+            transition: background-color 0.2s, transform 0.1s;
+            text-decoration: none;
+            display: block;
+            text-align: center;
         }
 
         .btn-finalizar:hover {
             background-color: #1e7e34;
+            transform: translateY(-2px);
+        }
+
+        .btn-finalizar:active {
+            transform: translateY(0);
+        }
+
+        /* Estilo para o botão desabilitado */
+        .btn-finalizar.disabled {
+            background-color: var(--cor-desabilitado);
+            cursor: not-allowed;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .btn-finalizar.disabled:hover {
+            background-color: var(--cor-desabilitado);
+            transform: none;
+        }
+
+        /* Mensagem quando o carrinho está vazio */
+        .carrinho-vazio-mensagem {
+            text-align: center;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 15px;
+        }
+
+        .carrinho-vazio-mensagem p {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            color: var(--cor-texto);
         }
 
         @media (max-width: 992px) {
@@ -482,8 +528,7 @@
         <div class="header-main">
             <div class="brand-block">
                 <a href="{{ url_for('index') }}" class="logo-link" title="Voltar para a página inicial">
-                    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo Full Tech Imports"
-                        class="logo">
+                    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo Full Tech Imports" class="logo">
                 </a>
 
                 <div class="brand-info">
@@ -500,7 +545,6 @@
                 <a href="{{ url_for('carrinho') }}" class="icon-button" title="Carrinho">
                     <span class="material-icons">shopping_cart</span>
                 </a>
-
             </div>
         </div>
     </header>
@@ -521,90 +565,92 @@
             <div class="resumo-tabela">
                 <p>
                     <span>Subtotal</span>
-                    <span>R$ {{ "%.2f"|format(total) }}</span>
+                    <span>R$ {{ total|brl }}</span>
                 </p>
                 <p>
                     <span>Total do Frete</span>
-                    <span id="freteValorDynamic">{% if frete %}R$ {{ "%.2f"|format(frete) }}{% else %}Não calculado{%
-                        endif %}</span>
+                    <span id="freteValorDynamic">
+                        {% if frete %}R$ {{ frete|brl }}{% else %}Não calculado{% endif %}
+                    </span>
                 </p>
                 <p class="total">
                     <span>Total</span>
-                    <span id="totalComFrete">R$ {{ "%.2f"|format(total_final) }}</span>
+                    <span id="totalComFrete">R$ {{ total_final|brl }}</span>
                 </p>
             </div>
 
             <div class="resumo-valores">
                 <p>
-                    <strong>R$ {{ "%.2f"|format(total_final * 0.95) }}</strong>
+                    <strong>R$ {{ (total_final * 0.95)|brl if carrinho else "0,00" }}</strong>
                     à vista no Pix (5% Off)
                 </p>
                 <p class="parcelas">
-                    ou **R$ {{ "%.2f"|format(total_final) }}**<br>
-                    em até 6x R$ {{ "%.2f"|format(total_final / 6) }} sem juros
+                    ou R$ {{ total_final|brl if carrinho else "0,00" }}<br>
+                    em até 6x R$ {{ (total_final / 6)|brl if carrinho else "0,00" }} sem juros
                 </p>
             </div>
 
-            <button class="btn-finalizar">Finalizar Compra</button>
+            {% if carrinho %}
+                <a href="{{ url_for('checkout') }}" class="btn-finalizar">Finalizar Compra</a>
+            {% else %}
+                <a href="#" class="btn-finalizar disabled" onclick="return false;">Finalizar Compra</a>
+            {% endif %}
         </div>
 
         <div class="carrinho-itens">
             {% if carrinho %}
-            {% for id, item in carrinho.items() %}
-            <div class="item-card">
-                {% if item.imagem %}
-                <img src="{{ url_for('static', filename=item.imagem) }}" alt="{{ item.nome }}" class="produto-img">
-                {% else %}
-                <img src="{{ url_for('static', filename='img/default.png') }}" alt="Sem imagem" class="produto-img">
-                {% endif %}
+                {% for id, item in carrinho.items() %}
+                <div class="item-card">
+                    {% if item.imagem %}
+                    <img src="{{ url_for('static', filename=item.imagem) }}" alt="{{ item.nome }}" class="produto-img">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='img/default.png') }}" alt="Sem imagem" class="produto-img">
+                    {% endif %}
 
-                <div class="item-details">
-                    <strong>{{ item.nome }}</strong>
-                    <p>ID: {{ id }}</p>
-                </div>
-
-                <div class="item-actions">
-                    <div class="quantity-control">
-                        <button type="button" onclick="updateQuantity('{{ id }}', 'decrease')"
-                            title="Diminuir Quantidade" {% if item.quantidade==1 %}disabled{% endif %}>
-                            -
-                        </button>
-                        <span id="quantity-{{ id }}">{{ item.quantidade }}</span>
-                        <button type="button" onclick="updateQuantity('{{ id }}', 'increase')"
-                            title="Aumentar Quantidade">
-                            +
-                        </button>
+                    <div class="item-details">
+                        <strong>{{ item.nome }}</strong>
                     </div>
 
-                    <div class="price-info">
-                        <div class="price-col">
-                            R$ {{ "%.2f"|format(item.preco * item.quantidade) }}
-                            <span class="price-pix">no Pix: R$ {{ "%.2f"|format((item.preco * item.quantidade) * 0.95)
-                                }}</span>
+                    <div class="item-actions">
+                        <div class="quantity-control">
+                            <button type="button" onclick="updateQuantity('{{ id }}', 'decrease')"
+                                title="Diminuir Quantidade" {% if item.quantidade==1 %}disabled{% endif %}>-</button>
+                            <span id="quantity-{{ id }}">{{ item.quantidade }}</span>
+                            <button type="button" onclick="updateQuantity('{{ id }}', 'increase')" title="Aumentar Quantidade">+</button>
                         </div>
 
-                        <form action="{{ url_for('remover_do_carrinho', produto_id=id) }}" method="POST"
-                            style="display:inline-block;">
-                            <button type="submit" class="btn-remover-lixeira" title="Remover Item">
-                                🗑️
-                            </button>
-                        </form>
+                        <div class="price-info">
+                            <div class="price-col">
+                                R$ {{ (item.preco * item.quantidade)|brl }}
+                                <span class="price-pix">no Pix: R$ {{ ((item.preco * item.quantidade) * 0.95)|brl }}</span>
+                            </div>
+
+                            <form action="{{ url_for('remover_do_carrinho', produto_id=id) }}" method="POST" style="display:inline-block;">
+                                <button type="submit" class="btn-remover-lixeira" title="Remover Item">
+                                    <span class="material-icons">delete</span>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
-            {% endfor %}
-            <a href="{{ url_for('index') }}#catalogo" class="btn-mais-produtos">Mais Produtos</a>
-            {% else %}
-            <div class="item-card">
-                <p>Seu carrinho está vazio.</p>
+                {% endfor %}
                 <a href="{{ url_for('index') }}#catalogo" class="btn-mais-produtos">Mais Produtos</a>
-            </div>
+            {% else %}
+                <div class="carrinho-vazio-mensagem">
+                    <p>Seu carrinho está vazio.</p>
+                    <a href="{{ url_for('index') }}#catalogo" class="btn-mais-produtos">Mais Produtos</a>
+                </div>
             {% endif %}
         </div>
 
     </div>
 
     <script>
+        // Função JS para formatar valores com vírgula
+        function formatarBRL(valor) {
+            return valor.toFixed(2).replace('.', ',');
+        }
+
         async function updateQuantity(productId, type) {
             const quantitySpan = document.getElementById(`quantity-${productId}`);
             let currentQuantity = parseInt(quantitySpan.innerText);
@@ -638,7 +684,6 @@
                 alert("Erro de comunicação com o servidor.");
             }
         }
-
 
         document.addEventListener("DOMContentLoaded", function () {
             const freteForm = document.getElementById("freteForm");
@@ -677,8 +722,8 @@
                     const frete = parseFloat(data.frete);
                     const totalFinalCalculado = subtotal + frete;
 
-                    freteValor.innerText = `R$ ${frete.toFixed(2)}`;
-                    totalComFrete.innerText = `R$ ${totalFinalCalculado.toFixed(2)}`;
+                    freteValor.innerText = `R$ ${formatarBRL(frete)}`;
+                    totalComFrete.innerText = `R$ ${formatarBRL(totalFinalCalculado)}`;
                     window.location.reload();
 
                 } catch (err) {
